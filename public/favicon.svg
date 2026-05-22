@@ -1,0 +1,30 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="mask" gradientUnits="userSpaceOnUse">
+      <stop offset="80%" stop-color="white" />
+      <stop offset="80%" stop-color="black" />
+    </radialGradient>
+  </defs>
+
+  <foreignObject width="64" height="64">
+    <div xmlns="http://www.w3.org/1999/xhtml"
+      style="
+        width:64px;
+        height:64px;
+        border-radius:50%;
+        background:conic-gradient(
+          #d04560,
+          #d08c45,
+          #d0b445,
+          #4fae7a,
+          #5a8ed0,
+          #9a72d0,
+          #d06a9a,
+          #d04560
+        );
+        -webkit-mask: radial-gradient(circle, transparent 45%, black 46%);
+        mask: radial-gradient(circle, transparent 45%, black 46%);
+      "
+    />
+  </foreignObject>
+</svg>

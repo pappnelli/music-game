@@ -1,0 +1,110 @@
+@import "./game.css";
+@import "./setup.css";
+@import "./components.css";
+
+:root {
+  /* --team-orange: #d08c45;
+  --team-yellow: #d0b445;
+  --team-pink: #d06a9a;
+  --team-green: #4fae7a;
+  --team-blue: #5a8ed0;
+  --team-purple: #9a72d0;
+  --team-red: #d04560; */
+
+  --rainbow-border: linear-gradient(var(--color-card-bg), var(--color-card-bg)) padding-box,
+    conic-gradient(
+        var(--team-1),
+        var(--team-2),
+        var(--team-3),
+        var(--team-4),
+        var(--team-5),
+        var(--team-6),
+        var(--team-7),
+        var(--team-8),
+        var(--team-1)
+      )
+      border-box;
+}
+
+:root[data-theme="light"] {
+  --color-bg: #f8f4f1;
+  --color-text: #151a28;
+  --color-muted: #b8b3ad;
+
+  --color-primary: #7a8f4e;
+  --color-primary-hover: #6c8044;
+
+  --color-secondary: #cd8963;
+  --color-secondary-hover: #ba7b53;
+
+  --color-ghost-selected: #d8d0ca;
+  --color-ghost-hover: #e6ded9;
+
+  --color-card-bg: #fff;
+  --color-card-text: #000;
+
+  --team-1: #b84a4a; /* tiszta vörös, nem primary-rokon */
+  --team-2: #d07a2a; /* narancs, de nem secondary-rokon */
+  --team-3: #c7b428; /* meleg sárga, jól üt a bg-n */
+  --team-4: #5f8f3a; /* zöld, de más tónus mint primary */
+  --team-5: #2f8f84; /* tiszta teal */
+  --team-6: #3f6fb8; /* hideg kék */
+  --team-7: #7a55c7; /* lila, de nem primary-lila */
+  --team-8: #c75a9e; /* pink-lila, jól elüt mindentől */
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #151a28;
+  --color-text: #f8f4f1;
+  --color-muted: #6b6f7d;
+
+  --color-primary: #a05fa8;
+  --color-primary-hover: #925599;
+
+  --color-secondary: #425fae;
+  --color-secondary-hover: #3b549d;
+
+  --color-ghost-selected: #2b3447;
+  --color-ghost-hover: #242c3f;
+
+  --color-card-bg: #000;
+  --color-card-text: #fff;
+
+  --team-1: #ff5f5f; /* világító vörös */
+  --team-2: #ff9b3b; /* neon narancs */
+  --team-3: #ffe34d; /* fényes sárga */
+  --team-4: #8ce46a; /* világító zöld */
+  --team-5: #4fe3d1; /* neon teal */
+  --team-6: #5fa8ff; /* világító kék */
+  --team-7: #b08cff; /* neon lila */
+  --team-8: #ff7fc2; /* neon pink */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-feature-settings: "smcp";
+  font-family: "Inter", sans-serif;
+
+  font-variant: small-caps;
+  letter-spacing: 1px;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  user-select: none;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+}
