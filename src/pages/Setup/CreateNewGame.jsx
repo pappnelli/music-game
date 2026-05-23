@@ -38,7 +38,7 @@ export default function CreateNewGame({ songs }) {
   const [startingTokens, setStartingTokens] = useState(3);
   // const [mode, setMode] = useState("qr"); // "spotify" | "qr"
 
-  const genre = useSelector((state) => state.setup.genre ?? []);
+  const genre = useSelector((state) => state.setup.genre ?? []).filter((g) => g !== "rock");
   const yearStart = useSelector((state) => state.setup.yearStart);
   const yearEnd = useSelector((state) => state.setup.yearEnd);
   const teams = useSelector((state) => state.setup.teams ?? []);

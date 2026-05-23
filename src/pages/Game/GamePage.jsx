@@ -33,7 +33,7 @@ export default function GamePage() {
   const status = useSelector((state) => state.game.status);
   const showSolution = useSelector((state) => state.game.showSolution);
   const winnerId = useSelector((state) => state.game.winnerId);
-  const musicMode = useSelector((state) => state.game.musicMode);
+  // const musicMode = useSelector((state) => state.game.musicMode);
 
   const [qrImage, setQrImage] = useState(null);
   const [selectedTeamId, setSelectedTeamId] = useState(null);
