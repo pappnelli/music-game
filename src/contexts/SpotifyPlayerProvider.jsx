@@ -53,7 +53,7 @@ export function SpotifyPlayerProvider({ children }) {
         // todo ha van játék folyamatban akkor jöjjön egy modal amivel be lehet újra jelentkezni ha nincs mentett játék akkor töröljük a localstoragebol amit kell
         console.error("Spotify authentication error:", message);
 
-        console.log(isGamePage, "is game page");
+        /*console.log(isGamePage, "is game page");
 
         if (isGamePage) {
           //window.dispatchEvent(new CustomEvent("spotify-auth-expired"));
@@ -63,7 +63,7 @@ export function SpotifyPlayerProvider({ children }) {
           localStorage.removeItem("spotify_expires_in");
           localStorage.removeItem("spotify_token_timestamp");
           localStorage.removeItem("spotify_code_verifier");
-        }
+        }*/
       });
 
       p.addListener("account_error", ({ message }) => {
