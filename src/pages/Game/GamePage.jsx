@@ -20,6 +20,8 @@ import GuessingCard from "../../features/game/GuessingCard";
 import Token from "../../features/game/Token";
 import NewCardButton from "../../features/guess/NewCardButton";
 import StartMusicButton from "../../features/guess/StartMusicButton";
+import { useSpotifyPlayer } from "../../contexts/useSpotifyPlayer";
+import { startSpotifyPlayback } from "../../utils/spotifyPlayback";
 
 export default function GamePage() {
   const dispatch = useDispatch();
@@ -42,6 +44,7 @@ export default function GamePage() {
   const rotatedTeams = currentIndex >= 0 ? [...teams.slice(currentIndex), ...teams.slice(0, currentIndex)] : teams;
 
   const accessToken = localStorage.getItem("spotify_access_token");
+  const { deviceId } = useSpotifyPlayer();
 
   useEffect(() => {
     let cancelled = false;
@@ -61,6 +64,22 @@ export default function GamePage() {
       cancelled = true;
     };
   }, [currentSong]);
+
+  useEffect(() => {
+    console.log("Current song changed:", currentSong);
+    if (!currentSong) return;
+    if (!deviceId) return;
+
+    const trackId = currentSong.spotify_url?.split("/track/")[1]?.split("?")[0];
+
+    if (!trackId) return;
+
+    startSpotifyPlayback({
+      deviceId,
+      trackId,
+      accessToken,
+    });
+  }, [currentSong, deviceId]);
 
   function handleDragEnd(event) {
     document.body.style.cursor = "default";
@@ -127,7 +146,7 @@ export default function GamePage() {
       >
         <div className="first-row">
           <div style={{ minWidth: "400px" }}>
-            <h2 style={{ marginBottom: "1rem" }}>Next team up:</h2>
+            <h2 style={{ marginBottom: "1rem" }}>Current team:</h2>
             <TeamDisplay teamId={currentTeamId} />
           </div>
 
@@ -160,11 +179,7 @@ export default function GamePage() {
 
           <div className="second-col">
             {!showSolution ? (
-              musicMode === "qr" ? (
-                <QRCodeDisplay qrImage={qrImage} />
-              ) : (
-                <StartMusicButton currentSong={currentSong} accessToken={accessToken} />
-              )
+              <QRCodeDisplay qrImage={qrImage} />
             ) : (
               currentSong && <AnswerDisplay year={currentSong.year} artist={currentSong.artist} title={currentSong.title} />
             )}
@@ -174,7 +189,11 @@ export default function GamePage() {
             {currentSong &&
               (!showSolution ? (
                 <div style={{ flex: 1, alignSelf: "center", display: "flex", flexFlow: "column", gap: "1rem" }}>
-                  <NewCardButton />
+                  <div style={{ display: "flex", gap: "1rem" }}>
+                    <StartMusicButton currentSong={currentSong} accessToken={accessToken} />
+
+                    <NewCardButton />
+                  </div>
 
                   <ShowAnswerButton />
                 </div>

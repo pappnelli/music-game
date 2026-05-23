@@ -1,30 +1,31 @@
+import { CheckIcon } from "lucide-react";
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useNotify } from "../../contexts/useNotify";
+import { useSettings } from "../../contexts/useSettings";
 import GenreSelector from "../../features/setup/GenreSelector";
+import NewTeamInput from "../../features/setup/NewTeamInput";
+import SongsPerYearSelector from "../../features/setup/SongsPerYearSelector";
 import StartGameButton from "../../features/setup/StartGameButton";
 import StartTokenSelector from "../../features/setup/StartTokenSelector";
-import NewTeamInput from "../../features/setup/NewTeamInput";
+import TeamList from "../../features/setup/TeamList";
 import WinnerCardsSelector from "../../features/setup/WinnerCardsSelector";
 import YearRangeSelector from "../../features/setup/YearRangeSelector";
 import Button from "../../ui/Button";
+import { selectSongsPerYear } from "../../utils/selectSongsPerYear";
+import { redirectToSpotifyLogin } from "../../utils/spotifyAuth";
 import { startGame } from "../Game/gameSlice";
 import {
   cancelCreatingNewGame,
   resetSetup,
   setGenre,
+  setMusicMode,
   setSongsPerYear,
   setWinCondition,
   setYearEnd,
   setYearStart,
-  setMusicMode,
 } from "./setupSlice";
-import TeamList from "../../features/setup/TeamList";
-import { selectSongsPerYear } from "../../utils/selectSongsPerYear";
-import { redirectToSpotifyLogin } from "../../utils/spotifyAuth";
-import SongsPerYearSelector from "../../features/setup/SongsPerYearSelector";
-import { useSettings } from "../../contexts/useSettings";
 
 export default function CreateNewGame({ songs }) {
   const dispatch = useDispatch();
@@ -143,8 +144,12 @@ export default function CreateNewGame({ songs }) {
           {/*  */}
           <div>
             <h3 className="input-label">Song source</h3>
+            <label style={{ display: "flex", gap: "0.5rem", alignItems: "center", height: "40px" }}>
+              <input type="radio" name="mode" value="qr" checked={musicMode === "qr"} onChange={() => dispatch(setMusicMode("qr"))} />
+              QR‑kód
+            </label>
 
-            <label style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+            <label style={{ display: "flex", gap: "0.5rem", alignItems: "center", height: "40px" }}>
               <input
                 type="radio"
                 name="mode"
@@ -154,18 +159,18 @@ export default function CreateNewGame({ songs }) {
               />
               Spotify
             </label>
-
-            <label style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-              <input type="radio" name="mode" value="qr" checked={musicMode === "qr"} onChange={() => dispatch(setMusicMode("qr"))} />
-              QR‑kód
-            </label>
           </div>
 
           {musicMode === "spotify" && (
             <>
               {!isSpotifyLoggedIn && <Button onClick={redirectToSpotifyLogin}>Connect Spotify</Button>}
 
-              {isSpotifyLoggedIn && <p style={{ color: "green" }}>Spotify connected ✓</p>}
+              {isSpotifyLoggedIn && (
+                <div className="connected-message">
+                  <p>Spotify connected</p>
+                  <CheckIcon size={16} />
+                </div>
+              )}
             </>
           )}
           {/*  */}

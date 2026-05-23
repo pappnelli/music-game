@@ -69,6 +69,19 @@
         cursor: grab;
       }
     }
+
+    .connected-message {
+      display: flex;
+      gap: 0.5rem;
+      width: 286px;
+      justify-content: center;
+      color: var(--team-4);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      background-color: var(--color-ghost-selected);
+      font-weight: bold;
+      font-size: 14.5px;
+    }
   }
 
   .input-label {

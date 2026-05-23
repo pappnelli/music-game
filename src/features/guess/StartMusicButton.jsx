@@ -1,5 +1,7 @@
+import { Play } from "lucide-react";
 import { useSpotifyPlayer } from "../../contexts/useSpotifyPlayer";
 import Button from "../../ui/Button";
+import { startSpotifyPlayback } from "../../utils/spotifyPlayback";
 
 function extractTrackId(url) {
   if (!url) return null;
@@ -11,7 +13,7 @@ export default function StartMusicButton({ currentSong, accessToken }) {
   const { deviceId } = useSpotifyPlayer();
   const trackId = extractTrackId(currentSong?.spotify_url);
 
-  async function startSpotifyPlayback() {
+  /*async function startSpotifyPlayback() {
     if (!deviceId) {
       console.warn("Spotify device not ready yet");
       return;
@@ -36,13 +38,27 @@ export default function StartMusicButton({ currentSong, accessToken }) {
     } catch (err) {
       console.error("Failed to start Spotify playback:", err);
     }
+  }*/
+
+  async function handlePlay() {
+    await startSpotifyPlayback({
+      deviceId,
+      trackId,
+      accessToken,
+    });
   }
 
+  // return (
+  //   <div className="qr-code">
+  //     <Button disabled={!deviceId || !trackId} onClick={startSpotifyPlayback}>
+  //       Start music
+  //     </Button>
+  //   </div>
+  // );
+
   return (
-    <div className="qr-code">
-      <Button disabled={!deviceId || !trackId} onClick={startSpotifyPlayback}>
-        Start music
-      </Button>
-    </div>
+    <Button disabled={!deviceId || !trackId} onClick={handlePlay} className="icon-button" style={{ width: "fit-content" }}>
+      <Play size={16} />
+    </Button>
   );
 }

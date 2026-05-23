@@ -290,6 +290,13 @@ const gameSlice = createSlice({
 
       // state.showSolution = false;
       // state.roundWinnerName = null;
+
+      for (const token of state.tokens) {
+        if (state.teams.find((t) => t.id === token.teamId)) {
+          state.teams.find((t) => t.id === token.teamId).tokens += 1;
+        }
+      }
+
       state.tokens = [];
       state.cardPosition = null;
 
