@@ -1,7 +1,7 @@
 import * as XLSX from "xlsx";
 
 export async function loadSongs() {
-  try {
+  /* try {
     const custom = await fetch("/my-hits.xlsx");
     if (custom.ok) {
       const buffer = await custom.arrayBuffer();
@@ -11,7 +11,7 @@ export async function loadSongs() {
     }
   } catch (e) {
     // ha nincs, átmegyünk a fallbackre
-  }
+  } */
 
   const response = await fetch("/hits.xlsx");
   const buffer = await response.arrayBuffer();
