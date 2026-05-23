@@ -87,7 +87,10 @@ export function SpotifyPlayerProvider({ children }) {
   // 🔒 Token változás guard
   const prevTokenRef = useRef(null);
 
-  // TOKEN FIGYELÉSE (storage event helyett interval)
+  // 🔒 Player már létrejött ezen a gépen?
+  const playerCreatedRef = useRef(false);
+
+  // TOKEN FIGYELÉSE
   useEffect(() => {
     const interval = setInterval(() => {
       const newToken = localStorage.getItem("spotify_access_token");
@@ -103,19 +106,15 @@ export function SpotifyPlayerProvider({ children }) {
   useEffect(() => {
     if (!token) return;
 
-    // 🔒 Ha a token nem változott → ne inicializálj új playert
+    // 🔒 Ha a token nem változott → ne csinálj semmit
     if (prevTokenRef.current === token) {
       return;
     }
     prevTokenRef.current = token;
 
-    // 🔥 Régi player lekapcsolása (async, hogy ne dobjon React warningot)
-    if (player) {
-      player.disconnect();
-      setTimeout(() => {
-        setPlayer(null);
-        setDeviceId(null);
-      }, 0);
+    // 🔒 Ha ezen a gépen már létrejött a player → ne csinálj semmit
+    if (playerCreatedRef.current) {
+      return;
     }
 
     function initPlayer() {
@@ -130,24 +129,17 @@ export function SpotifyPlayerProvider({ children }) {
         setDeviceId(device_id);
       });
 
-      p.addListener("not_ready", ({ device_id }) => {
-        console.warn("Spotify device not ready:", device_id);
-      });
+      p.addListener("initialization_error", ({ message }) => console.error("Spotify initialization error:", message));
 
-      p.addListener("initialization_error", ({ message }) => {
-        console.error("Spotify initialization error:", message);
-      });
+      p.addListener("authentication_error", ({ message }) => console.error("Spotify authentication error:", message));
 
-      p.addListener("authentication_error", ({ message }) => {
-        console.error("Spotify authentication error:", message);
-      });
-
-      p.addListener("account_error", ({ message }) => {
-        console.error("Spotify account error:", message);
-      });
+      p.addListener("account_error", ({ message }) => console.error("Spotify account error:", message));
 
       p.connect();
       setPlayer(p);
+
+      // 🔒 Player ezen a gépen létrejött → többé nem csináljuk újra
+      playerCreatedRef.current = true;
     }
 
     // Spotify SDK betöltésének várása
