@@ -4,16 +4,29 @@ import { SpotifyPlayerContext } from "./SpotifyPlayerContext";
 export function SpotifyPlayerProvider({ children }) {
   const [player, setPlayer] = useState(null);
   const [deviceId, setDeviceId] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("spotify_access_token"));
 
-  const accessToken = localStorage.getItem("spotify_access_token");
+  // const accessToken = localStorage.getItem("spotify_access_token");
 
   useEffect(() => {
-    if (!accessToken) return;
+    const handler = () => {
+      const newToken = localStorage.getItem("spotify_access_token");
+      if (newToken !== token) {
+        setToken(newToken);
+      }
+    };
+
+    window.addEventListener("storage", handler);
+    return () => window.removeEventListener("storage", handler);
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
 
     function initPlayer() {
       const p = new window.Spotify.Player({
         name: "My Hitster Player",
-        getOAuthToken: (cb) => cb(accessToken),
+        getOAuthToken: (cb) => cb(token),
         volume: 0.8,
       });
 
@@ -59,7 +72,7 @@ export function SpotifyPlayerProvider({ children }) {
     // Ha már betöltődött → indítjuk
     console.log("initPlayer 2");
     initPlayer();
-  }, [accessToken]);
+  }, [token]);
 
   return <SpotifyPlayerContext.Provider value={{ player, deviceId }}>{children}</SpotifyPlayerContext.Provider>;
 }
