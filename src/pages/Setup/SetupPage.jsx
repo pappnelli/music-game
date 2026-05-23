@@ -68,7 +68,7 @@ export default function SetupPage() {
         height: "100%",
       }}
     >
-      <h1 style={{ margin: "auto" }}>My Hitster</h1>
+      <h1 style={{ margin: "auto" }}>Music Game</h1>
 
       <div style={{ display: "flex", gap: "2rem", flexFlow: "column", margin: "auto" }}>
         <Button

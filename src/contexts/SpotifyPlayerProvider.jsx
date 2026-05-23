@@ -24,7 +24,7 @@ export function SpotifyPlayerProvider({ children }) {
 
     function initPlayer() {
       const p = new window.Spotify.Player({
-        name: "My Hitster Player",
+        name: "Music Game Player",
         getOAuthToken: (cb) => cb(token),
         volume: 0.8,
       });
