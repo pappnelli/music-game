@@ -203,7 +203,7 @@ export function SpotifyPlayerProvider({ children }) {
         spotifyPlayer.disconnect();
       }
     };
-  }, [token, player]); // token váltás = teljes újrakezdés
+  }, [token]); // token váltás = teljes újrakezdés
 
   return <SpotifyPlayerContext.Provider value={{ player, deviceId }}>{children}</SpotifyPlayerContext.Provider>;
 }
