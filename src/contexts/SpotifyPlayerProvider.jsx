@@ -19,8 +19,14 @@ export function SpotifyPlayerProvider({ children }) {
   }, [token]);
 
   // PLAYER INITIALIZÁLÁSA
-  useEffect(() => {
+  /* useEffect(() => {
     if (!token) return;
+
+    if (player) {
+      player.disconnect();
+      setPlayer(null);
+      setDeviceId(null);
+    }
 
     function initPlayer() {
       const p = new window.Spotify.Player({
@@ -66,6 +72,50 @@ export function SpotifyPlayerProvider({ children }) {
     }
 
     initPlayer();
+  }, [token]); */
+
+  useEffect(() => {
+    if (!token) return;
+
+    let p;
+
+    function initPlayer() {
+      p = new window.Spotify.Player({
+        name: "Music Game Player",
+        getOAuthToken: (cb) => cb(token),
+        volume: 0.8,
+      });
+
+      p.addListener("ready", ({ device_id }) => {
+        console.log("Spotify device ready:", device_id);
+        setDeviceId(device_id);
+      });
+
+      p.connect();
+      setPlayer(p);
+    }
+
+    if (!window.Spotify) {
+      const interval = setInterval(() => {
+        if (window.Spotify) {
+          clearInterval(interval);
+          initPlayer();
+        }
+      }, 300);
+
+      return () => clearInterval(interval);
+    }
+
+    initPlayer();
+
+    // ⭐ A LÉNYEG: teljes cleanup
+    return () => {
+      if (p) {
+        p.disconnect();
+      }
+      setPlayer(null);
+      setDeviceId(null);
+    };
   }, [token]);
 
   return <SpotifyPlayerContext.Provider value={{ player, deviceId }}>{children}</SpotifyPlayerContext.Provider>;
