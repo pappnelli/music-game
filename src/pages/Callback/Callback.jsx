@@ -41,6 +41,14 @@ export default function Callback() {
           },
           body,
         });
+        /* const response = await fetch("/api/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            code,
+            codeVerifier,
+          }),
+        }); */
 
         const data = await response.json();
 
