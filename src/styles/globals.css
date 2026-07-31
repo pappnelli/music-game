@@ -1,0 +1,123 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@font-face {
+  font-family: "Sora Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 800;
+  src: url(@fontsource-variable/sora/files/sora-latin-wght-normal.woff2) format("woff2-variations");
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-app-black: var(--app-black);
+  --color-app-white: var(--app-white);
+
+  --color-teams-red: var(--team-red);
+  --color-teams-blue: var(--team-blue);
+  --color-teams-green: var(--team-green);
+  --color-teams-yellow: var(--team-yellow);
+  --color-teams-purple: var(--team-purple);
+  --color-teams-orange: var(--team-orange);
+  --color-teams-pink: var(--team-pink);
+  --color-teams-cyan: var(--team-cyan);
+  --color-teams-lime: var(--team-lime);
+  --color-teams-white: var(--team-white);
+
+  --radius-lg: var(--radius);
+}
+
+:root {
+  --radius: 0.75rem;
+
+  --background: #f4f4f8; /* Puha, selymes világosszürke (nem vakító fehér) */
+  --foreground: #1e1b2e; /* Jól olvasható mélylila-szürke */
+  --card: rgba(255, 255, 255, 0.85); /* Világos, tiszta kártya background */
+  --card-foreground: #1e1b2e;
+
+  --primary: #d90087; /* Telt Neon Magenta */
+  --secondary: #2563eb; /* Elektromos Kék */
+  --accent: #059669; /* Toxikus Zöld */
+
+  /* 📐 EGYSÉGES KERETEK & INPUTOK */
+  --border: rgba(147, 130, 180, 0.35); /* Finom, egységes keretszín az egész felületen */
+  --input: rgba(147, 130, 180, 0.2);
+  --ring: #d90087;
+  --muted-foreground: #6b6380;
+
+  --app-black: #e8e7f0;
+  --app-white: #1e1b2e;
+
+  --shadow-glow: 0 0 30px rgba(217, 0, 135, 0.18);
+
+  --team-red: #d90032;
+  --team-blue: #0088cc;
+  --team-green: #059669;
+  --team-yellow: #d97706;
+  --team-purple: #9333ea;
+  --team-orange: #ea580c;
+  --team-pink: #db2777;
+  --team-cyan: #0891b2;
+  --team-lime: #65a30d;
+  --team-white: #1e1b2e;
+}
+
+.dark {
+  --background: #12131c; /* Elegáns sötétszürke (nem dakszli fekete!) */
+  --foreground: #f0edf9; /* Lágy világos szöveg */
+  --card: rgba(28, 29, 43, 0.7); /* Kicsit világosabb kiemelkedő kártyák */
+  --card-foreground: #f0edf9;
+
+  --primary: #ff2aab; /* Ragyogó Neon Magenta */
+  --secondary: #3b82f6; /* Ragyogó Kék */
+  --accent: #10b981; /* Ragyogó Zöld */
+
+  /* 📐 EGYSÉGES KERETEK & INPUTOK */
+  --border: rgba(255, 255, 255, 0.16); /* Minden komponensen tökéletesen egységes keret */
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: #ff2aab;
+  --muted-foreground: #9ca3af;
+
+  --app-black: #0d0e14;
+  --app-white: #f0edf9;
+
+  --shadow-glow: 0 0 30px rgba(255, 42, 171, 0.25);
+
+  --team-red: #ff003c;
+  --team-blue: #00aaff;
+  --team-green: #39ff14;
+  --team-yellow: #fdfd00;
+  --team-purple: #bc13fe;
+  --team-orange: #ff8800;
+  --team-pink: #ff00ff;
+  --team-cyan: #00f0ff;
+  --team-lime: #ccff00;
+  --team-white: #f0edf9;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground font-sans transition-colors duration-300;
+    background-image: radial-gradient(circle at center, var(--primary) 0%, transparent 70%);
+    background-size: 100% 100%;
+    background-blend-mode: soft-light;
+  }
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
