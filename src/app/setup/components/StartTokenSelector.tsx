@@ -2,7 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Minus, Plus } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Minus, Plus, Zap } from "lucide-react";
 
 interface StartTokenSelectorProps {
   value: number;
@@ -19,34 +20,25 @@ export default function StartTokenSelector({ value, onChange }: StartTokenSelect
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Starting Credits</label>
-      <div className="flex items-center gap-2">
-        {/* MINUS */}
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => onChange(Math.max(0, value - 1))}
-          className="h-10 w-10 shrink-0 border-border bg-app-black/40 hover:bg-primary/20 hover:border-primary transition-all duration-300"
-        >
+      <Label className="gap-1.5">
+        <Zap className="size-4 text-secondary" />
+        Starting steal tokens
+      </Label>
+
+      <div className="flex items-center gap-1.5">
+        <Button type="button" size="icon" variant="outline" onClick={() => onChange(Math.max(0, value - 1))} aria-label="Decrease starting tokens">
           <Minus size={16} />
         </Button>
 
-        {/* INPUT */}
         <Input
           type="number"
           placeholder="0"
           value={value}
           onChange={(e) => handleInput(e.target.value)}
-          className="h-10 w-24 text-center bg-app-black/40 border-border font-mono focus:border-primary focus:border-2 focus:ring-app-white focus-visible:ring-2"
+          className="text-center font-bold tabular-nums"
         />
 
-        {/* PLUS */}
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => onChange(value + 1)}
-          className="h-10 w-10 shrink-0 border-border bg-app-black/40 hover:bg-primary/20 hover:border-primary transition-all duration-300"
-        >
+        <Button type="button" size="icon" variant="outline" onClick={() => onChange(value + 1)} aria-label="Increase starting tokens">
           <Plus size={16} />
         </Button>
       </div>

@@ -14,14 +14,22 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-muted-foreground: var(--muted-foreground);
   --color-app-black: var(--app-black);
   --color-app-white: var(--app-white);
 
@@ -40,79 +48,137 @@
 }
 
 :root {
-  --radius: 0.75rem;
+  /* Candy Neon -- light theme: bubblegum pink + electric violet + neon cyan, cute & girly */
+  --radius: 1.1rem;
 
-  --background: #f4f4f8; /* Puha, selymes világosszürke (nem vakító fehér) */
-  --foreground: #1e1b2e; /* Jól olvasható mélylila-szürke */
-  --card: rgba(255, 255, 255, 0.85); /* Világos, tiszta kártya background */
-  --card-foreground: #1e1b2e;
+  --background: #fdf0fb; /* Pale bubblegum wash (never pure white) */
+  --foreground: #2a1240; /* Deep magenta-violet ink, crisp on every surface */
+  --card: rgba(255, 248, 253, 0.9); /* Frosted panel surface */
+  --card-foreground: #2a1240;
+  --popover: rgba(255, 248, 253, 0.98);
+  --popover-foreground: #2a1240;
 
-  --primary: #d90087; /* Telt Neon Magenta */
-  --secondary: #2563eb; /* Elektromos Kék */
-  --accent: #059669; /* Toxikus Zöld */
+  --primary: #ff2ec4; /* Bubblegum neon pink -- the hero color */
+  --primary-foreground: #fff5fc;
+  --secondary: #9b30ff; /* Electric violet */
+  --secondary-foreground: #fff5fc;
+  --accent: #00d9f2; /* Neon cyan pop accent */
+  --accent-foreground: #00272e;
 
-  /* 📐 EGYSÉGES KERETEK & INPUTOK */
-  --border: rgba(147, 130, 180, 0.35); /* Finom, egységes keretszín az egész felületen */
-  --input: rgba(147, 130, 180, 0.2);
-  --ring: #d90087;
-  --muted-foreground: #6b6380;
+  --muted: #f8e0f4; /* Soft candy-pink neutral surface */
+  --muted-foreground: #8a5f8f;
 
-  --app-black: #e8e7f0;
-  --app-white: #1e1b2e;
+  --destructive: #e11d48; /* Clear, unmistakable warning red */
+  --destructive-foreground: #fff3f5;
 
-  --shadow-glow: 0 0 30px rgba(217, 0, 135, 0.18);
+  /* UNIFIED BORDERS & INPUTS */
+  --border: rgba(255, 46, 196, 0.25); /* Pink-tinted, consistent across the UI */
+  --input: rgba(255, 46, 196, 0.13);
+  --ring: #ff2ec4;
 
-  --team-red: #d90032;
-  --team-blue: #0088cc;
-  --team-green: #059669;
-  --team-yellow: #d97706;
-  --team-purple: #9333ea;
-  --team-orange: #ea580c;
-  --team-pink: #db2777;
-  --team-cyan: #0891b2;
-  --team-lime: #65a30d;
-  --team-white: #1e1b2e;
+  --app-black: #f5e0f6; /* Neutral panel surface for this theme */
+  --app-white: #2a1240; /* High-contrast text/icon color on panels */
+
+  /* No blurred/glow shadow anywhere in the app -- every surface gets a flat, colored, hard
+     3D press shadow instead (box-shadow: 0 Npx 0 0 <tinted color>). See DESIGN_SYSTEM.md. */
+
+  --team-red: #ff2969;
+  --team-blue: #1f8bff;
+  --team-green: #00d264;
+  --team-yellow: #ffb300;
+  --team-purple: #a83bff;
+  --team-orange: #ff7300;
+  --team-pink: #ff3fc2;
+  --team-cyan: #00cfe8;
+  --team-lime: #a3e600;
+  --team-white: #2a1240;
 }
 
 .dark {
-  --background: #12131c; /* Elegáns sötétszürke (nem dakszli fekete!) */
-  --foreground: #f0edf9; /* Lágy világos szöveg */
-  --card: rgba(28, 29, 43, 0.7); /* Kicsit világosabb kiemelkedő kártyák */
-  --card-foreground: #f0edf9;
+  /* Candy Neon -- dark theme: neon pink-violet-cyan glow, never pure black */
+  --background: #1e0a2e; /* Deep magenta-violet-black, not black */
+  --foreground: #fdeefc; /* Soft pink-white, not pure white */
+  --card: rgba(48, 20, 58, 0.72); /* Elevated glassy panel */
+  --card-foreground: #fdeefc;
+  --popover: rgba(38, 14, 48, 0.97);
+  --popover-foreground: #fdeefc;
 
-  --primary: #ff2aab; /* Ragyogó Neon Magenta */
-  --secondary: #3b82f6; /* Ragyogó Kék */
-  --accent: #10b981; /* Ragyogó Zöld */
+  --primary: #ff4dd8; /* Neon bubblegum pink */
+  --primary-foreground: #330029;
+  --secondary: #b366ff; /* Neon electric violet */
+  --secondary-foreground: #24063a;
+  --accent: #00f5ff; /* Neon cyan */
+  --accent-foreground: #00272b;
 
-  /* 📐 EGYSÉGES KERETEK & INPUTOK */
-  --border: rgba(255, 255, 255, 0.16); /* Minden komponensen tökéletesen egységes keret */
+  --muted: #341a3f; /* Dark neutral surface */
+  --muted-foreground: #d0a8d6;
+
+  --destructive: #ff4d6d; /* Bright neon warning red */
+  --destructive-foreground: #2c0509;
+
+  /* UNIFIED BORDERS & INPUTS */
+  --border: rgba(255, 255, 255, 0.16); /* Perfectly consistent edge across components */
   --input: rgba(255, 255, 255, 0.08);
-  --ring: #ff2aab;
-  --muted-foreground: #9ca3af;
+  --ring: #ff4dd8;
 
-  --app-black: #0d0e14;
-  --app-white: #f0edf9;
+  --app-black: #180826; /* Near-black magenta-violet surface */
+  --app-white: #fdeefc; /* Near-white pink text/icon color */
 
-  --shadow-glow: 0 0 30px rgba(255, 42, 171, 0.25);
-
-  --team-red: #ff003c;
-  --team-blue: #00aaff;
-  --team-green: #39ff14;
-  --team-yellow: #fdfd00;
-  --team-purple: #bc13fe;
-  --team-orange: #ff8800;
-  --team-pink: #ff00ff;
-  --team-cyan: #00f0ff;
-  --team-lime: #ccff00;
-  --team-white: #f0edf9;
+  --team-red: #ff3b62;
+  --team-blue: #3aa3ff;
+  --team-green: #39ff8a;
+  --team-yellow: #ffe14d;
+  --team-purple: #cc8bff;
+  --team-orange: #ff9d33;
+  --team-pink: #ff67d6;
+  --team-cyan: #2df1ff;
+  --team-lime: #c8ff4d;
+  --team-white: #f6f0ff;
 }
 
 @layer base {
   body {
     @apply bg-background text-foreground font-sans transition-colors duration-300;
-    background-image: radial-gradient(circle at center, var(--primary) 0%, transparent 70%);
+    background-image:
+      radial-gradient(circle at 15% 10%, var(--secondary) 0%, transparent 35%),
+      radial-gradient(circle at 85% 15%, var(--accent) 0%, transparent 35%),
+      radial-gradient(circle at 50% 100%, var(--primary) 0%, transparent 45%);
     background-size: 100% 100%;
     background-blend-mode: soft-light;
+  }
+}
+
+@keyframes token-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(2deg);
+  }
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes pop-in {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
   }
 }
 

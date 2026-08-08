@@ -1,9 +1,12 @@
 "use client";
 
+import AppBackground from "@/components/AppBackground";
+import Disc from "@/components/Disc";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { resetSetup } from "@/lib/store/setupSlice";
+import { ListMusic, PlayCircle, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function HomeClient() {
@@ -11,6 +14,7 @@ export default function HomeClient() {
   const dispatch = useAppDispatch();
 
   const status = useAppSelector((s) => s.game.status);
+  const canContinue = status === "playing" || status === "finished";
 
   function handleNewGame() {
     dispatch(resetSetup());
@@ -22,41 +26,44 @@ export default function HomeClient() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] gap-12 p-8">
-      <div className="absolute top-4 right-4 z-11">
+    <div className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-6 py-16">
+      <AppBackground />
+
+      <div className="absolute top-6 right-6 z-10 [animation:pop-in_0.5s_cubic-bezier(0.34,1.56,0.64,1)]">
         <ThemeToggle />
       </div>
 
-      {/* Neon logó hatás */}
-      <div className="text-center space-y-2">
-        <h1 className="text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary drop-shadow-[0_0_10px_rgba(255,0,255,0.5)]">
-          MUSIC_GAME
-        </h1>
-        <p className="text-teams-cyan font-mono text-sm tracking-[0.2em] uppercase opacity-70">System: Ready for play</p>
-      </div>
+      <div className="relative z-10 flex w-full max-w-md flex-col items-center gap-10 text-center">
+        <div className="flex flex-col items-center gap-4 [animation:pop-in_0.6s_cubic-bezier(0.34,1.56,0.64,1)]">
+          <span className="relative flex size-20 items-center justify-center rounded-3xl border-2 border-primary bg-primary/10 shadow-[0_5px_0_0_color-mix(in_oklch,var(--primary),black_30%)] [animation:token-float_4s_ease-in-out_infinite]">
+            <Disc size={44} spin spinDuration="5s" shadow="0 2px 0 0 color-mix(in oklch, var(--primary), black 30%)" />
+            <Sparkles className="absolute -top-2 -right-2 size-5 text-secondary [animation:pop-in_2s_ease-in-out_infinite]" />
+          </span>
 
-      {/* Menü kártya */}
-      <div className="w-full max-w-sm bg-card backdrop-blur-md border border-border p-8 rounded-xl shadow-[var(--shadow-glow)]">
-        <div className="flex flex-col gap-4">
-          <Button
-            className="w-full h-14 text-lg font-bold uppercase tracking-widest bg-primary/20 border border-primary text-primary hover:bg-primary hover:text-app-black hover:shadow-[0_0_20px_var(--color-primary)] transition-all duration-300 rounded-lg"
-            onClick={handleNewGame}
-          >
-            Setup new game
-          </Button>
-
-          <Button
-            className="w-full h-14 text-lg font-bold uppercase tracking-widest bg-transparent border border-secondary text-secondary hover:bg-secondary hover:text-app-black hover:shadow-[0_0_20px_var(--color-secondary)] transition-all duration-300 rounded-lg"
-            disabled={status !== "playing" && status !== "finished"}
-            onClick={handleContinue}
-          >
-            Continue last
-          </Button>
+          <div>
+            <h1 className="text-5xl font-black tracking-tight text-foreground">
+              MUSIC <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">GAME</span>
+            </h1>
+            <p className="mt-2 text-sm font-semibold text-muted-foreground">Guess the year. Race the timeline. Steal the win.</p>
+          </div>
         </div>
 
-        {/* Dekoratív elem a kártya alján */}
-        <div className="mt-8 pt-4 border-t border-border/30 text-center">
-          <span className="text-xs font-mono text-foreground/40 uppercase">v.1.0.0 // Access permitted</span>
+        <div className="flex w-full flex-col gap-3">
+          <Button size="lg" onClick={handleNewGame} className="h-14 w-full text-base transition-transform hover:scale-[1.02]">
+            <PlayCircle className="size-5" />
+            Start New Game
+          </Button>
+
+          <Button
+            size="lg"
+            variant="outline"
+            disabled={!canContinue}
+            onClick={handleContinue}
+            className="h-14 w-full text-base transition-transform hover:scale-[1.02]"
+          >
+            <ListMusic className="size-5" />
+            Continue Last Game
+          </Button>
         </div>
       </div>
     </div>

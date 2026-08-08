@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Candy Neon — Music Game Style Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --radius: 1.1rem;
+    --background:#fdf0fb; --foreground:#2a1240;
+    --card: rgba(255,248,253,0.9); --card-foreground:#2a1240;
+    --popover: rgba(255,248,253,0.98); --popover-foreground:#2a1240;
+    --primary:#ff2ec4; --primary-foreground:#fff5fc;
+    --secondary:#9b30ff; --secondary-foreground:#fff5fc;
+    --accent:#00d9f2; --accent-foreground:#00272e;
+    --muted:#f8e0f4; --muted-foreground:#8a5f8f;
+    --destructive:#e11d48; --destructive-foreground:#fff3f5;
+    --border: rgba(255,46,196,0.25); --input: rgba(255,46,196,0.13); --ring:#ff2ec4;
+    --app-black:#f5e0f6; --app-white:#2a1240;
+    /* glow tokens removed by design decision -- hard shadow is used everywhere, no blurred halos anywhere in the app */
+    --team-red:#ff2969; --team-blue:#1f8bff; --team-green:#00d264; --team-yellow:#ffb300;
+    --team-purple:#a83bff; --team-orange:#ff7300; --team-pink:#ff3fc2; --team-cyan:#00cfe8;
+    --team-lime:#a3e600; --team-white:#2a1240;
+  }
+  .dark{
+    --background:#1e0a2e; --foreground:#fdeefc;
+    --card: rgba(48,20,58,0.72); --card-foreground:#fdeefc;
+    --popover: rgba(38,14,48,0.97); --popover-foreground:#fdeefc;
+    --primary:#ff4dd8; --primary-foreground:#330029;
+    --secondary:#b366ff; --secondary-foreground:#24063a;
+    --accent:#00f5ff; --accent-foreground:#00272b;
+    --muted:#341a3f; --muted-foreground:#d0a8d6;
+    --destructive:#ff4d6d; --destructive-foreground:#2c0509;
+    --border: rgba(255,255,255,0.16); --input: rgba(255,255,255,0.08); --ring:#ff4dd8;
+    --app-black:#180826; --app-white:#fdeefc;
+    --team-red:#ff3b62; --team-blue:#3aa3ff; --team-green:#39ff8a; --team-yellow:#ffe14d;
+    --team-purple:#cc8bff; --team-orange:#ff9d33; --team-pink:#ff67d6; --team-cyan:#2df1ff;
+    --team-lime:#c8ff4d; --team-white:#f6f0ff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:"Sora",system-ui,sans-serif; background:var(--background); color:var(--foreground);
+    transition:background .3s,color .3s;
+    position:relative;
+    overflow-x:hidden;
+    background-image:
+      radial-gradient(circle at 10% 6%, var(--secondary) 0%, transparent 28%),
+      radial-gradient(circle at 90% 4%, var(--accent) 0%, transparent 26%),
+      radial-gradient(circle at 96% 58%, var(--primary) 0%, transparent 30%),
+      radial-gradient(circle at 4% 52%, var(--team-cyan) 0%, transparent 24%),
+      radial-gradient(circle at 30% 100%, var(--primary) 0%, transparent 40%),
+      radial-gradient(circle at 78% 96%, var(--secondary) 0%, transparent 26%),
+      radial-gradient(circle at 55% 45%, var(--team-yellow) 0%, transparent 20%),
+      radial-gradient(circle 1.6px at center, color-mix(in oklch, var(--accent), transparent 10%) 100%, transparent 100%),
+      radial-gradient(circle 1.2px at center, color-mix(in oklch, var(--secondary), transparent 15%) 100%, transparent 100%),
+      radial-gradient(circle 1px at center, color-mix(in oklch, var(--primary), transparent 20%) 100%, transparent 100%);
+    background-repeat: no-repeat,no-repeat,no-repeat,no-repeat,no-repeat,no-repeat,no-repeat, repeat, repeat, repeat;
+    background-size: auto,auto,auto,auto,auto,auto,auto, 48px 48px, 34px 34px, 26px 26px;
+    background-position: 0 0,0 0,0 0,0 0,0 0,0 0,0 0, 6px 8px, 22px 18px, 12px 24px;
+    background-blend-mode: soft-light,soft-light,soft-light,soft-light,soft-light,soft-light,soft-light, normal, normal, normal;
+  }
+  .bg-decor{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .bg-decor svg{position:absolute;animation:bg-float ease-in-out infinite;filter:drop-shadow(0 2px 4px rgba(0,0,0,.08));}
+  @keyframes bg-float{0%,100%{transform:translateY(0) rotate(-8deg) scale(1);}50%{transform:translateY(-22px) rotate(10deg) scale(1.1);}}
+  h1,h2,h3,p{margin:0;}
+  .wrap{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:24px 20px 80px;}
+  .topbar{position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);background:color-mix(in oklch, var(--background), transparent 15%);border-bottom:2px solid var(--border);}
+  .topbar-inner{max-width:1280px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.05rem;letter-spacing:-.02em;}
+  .tabs{display:flex;gap:6px;background:var(--muted);padding:4px;border-radius:999px;border:2px solid var(--border);}
+  .tab-btn{border:none;background:transparent;padding:8px 16px;border-radius:999px;font-weight:800;font-size:.8rem;letter-spacing:.02em;color:var(--muted-foreground);cursor:pointer;transition:all .2s;text-transform:uppercase;}
+  .tab-btn.active{background:var(--primary);color:var(--primary-foreground);box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);}
+  .theme-switch{display:flex;align-items:center;gap:8px;border:2px solid var(--border);border-radius:999px;padding:4px 6px;background:var(--card);}
+  .theme-switch button{border:none;background:transparent;width:32px;height:32px;border-radius:999px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted-foreground);font-size:16px;}
+  .theme-switch button.active{background:var(--primary);color:var(--primary-foreground);box-shadow:0 2px 0 0 color-mix(in oklch,var(--primary),black 25%);}
+
+  section{display:none;}
+  section.active{display:block;}
+
+  .section-title{display:flex;align-items:center;gap:10px;font-size:1.6rem;font-weight:900;letter-spacing:-.02em;margin:40px 0 6px;}
+  .section-sub{color:var(--muted-foreground);font-weight:600;font-size:.9rem;margin-bottom:20px;}
+  .section-title:first-child{margin-top:24px;}
+
+  .grid{display:grid;gap:14px;}
+  .grid-cols-5{grid-template-columns:repeat(5,1fr);}
+  .grid-cols-4{grid-template-columns:repeat(4,1fr);}
+  .grid-cols-3{grid-template-columns:repeat(3,1fr);}
+  .grid-cols-2{grid-template-columns:repeat(2,1fr);}
+  @media(max-width:900px){.grid-cols-5,.grid-cols-4,.grid-cols-3{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:560px){.grid-cols-5,.grid-cols-4,.grid-cols-3,.grid-cols-2{grid-template-columns:1fr;}}
+
+  .swatch{border-radius:1.1rem;border:2px solid var(--border);overflow:hidden;background:var(--card);backdrop-filter:blur(10px);box-shadow:0 6px 0 0 var(--border);}
+  .swatch-color{height:64px;}
+  .swatch-label{padding:10px 12px;}
+  .swatch-name{font-weight:800;font-size:.8rem;}
+  .swatch-hex{font-size:.72rem;color:var(--muted-foreground);font-weight:600;}
+
+  .card{background:var(--card);border:2px solid var(--border);border-radius:1.1rem;box-shadow:0 6px 0 0 var(--border);backdrop-filter:blur(14px);padding:18px;}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;border:2px solid transparent;font-weight:800;font-size:.85rem;padding:11px 20px;cursor:pointer;transition:all .18s;}
+  .btn-default{background:var(--primary);color:var(--primary-foreground);box-shadow:0 4px 0 0 color-mix(in oklch,var(--primary),black 25%);}
+  .btn-default:hover{filter:brightness(1.1);}
+  .btn-default:active{box-shadow:none;transform:translateY(4px);}
+  .btn-secondary{background:var(--secondary);color:var(--secondary-foreground);box-shadow:0 4px 0 0 color-mix(in oklch,var(--secondary),black 25%);}
+  .btn-outline{background:var(--background);color:var(--foreground);border-color:color-mix(in oklch,var(--primary),transparent 60%);}
+  .btn-outline:hover{border-color:var(--primary);background:color-mix(in oklch,var(--primary),transparent 90%);}
+  .btn-ghost{background:transparent;color:var(--foreground);}
+  .btn-ghost:hover{background:var(--muted);}
+  .btn-destructive{background:color-mix(in oklch,var(--destructive),transparent 90%);color:var(--destructive);}
+  .btn-destructive:hover{background:color-mix(in oklch,var(--destructive),transparent 80%);}
+  .btn-lg{padding:15px 24px;font-size:.95rem;}
+  .btn-sm{padding:7px 14px;font-size:.76rem;}
+  .btn-icon{padding:10px;border-radius:999px;}
+  .btn:disabled{opacity:.45;cursor:not-allowed;}
+
+  .badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;font-weight:800;font-size:.68rem;padding:4px 11px;letter-spacing:.02em;}
+  .badge-primary{background:var(--primary);color:var(--primary-foreground);}
+  .badge-secondary{background:var(--secondary);color:var(--secondary-foreground);}
+  .badge-outline{border:2px solid color-mix(in oklch,var(--primary),transparent 60%);color:var(--foreground);}
+  .badge-accent{background:var(--accent);color:var(--accent-foreground);}
+
+  .input{width:100%;border-radius:.9rem;border:2px solid var(--border);background:var(--input);padding:10px 14px;font-family:inherit;font-weight:600;font-size:.85rem;color:var(--foreground);}
+  .input::placeholder{color:var(--muted-foreground);}
+
+  .pill-toggle{display:flex;gap:8px;flex-wrap:wrap;}
+  .pill{border-radius:999px;border:2px solid var(--border);background:color-mix(in oklch,var(--muted),transparent 20%);padding:8px 16px;font-weight:800;font-size:.78rem;cursor:pointer;transition:all .15s;color:var(--foreground);}
+  .pill.selected{border-color:var(--primary);background:color-mix(in oklch,var(--primary),transparent 88%);color:var(--primary);}
+
+  .checkbox{width:22px;height:22px;border-radius:.6rem;border:2px solid var(--border);background:var(--input);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;}
+  .checkbox.checked{background:var(--primary);border-color:var(--primary);color:var(--primary-foreground);box-shadow:0 0 0 4px color-mix(in oklch,var(--primary),transparent 80%);}
+
+  .vinyl{border-radius:999px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .vinyl-label{position:absolute;inset:26%;border-radius:999px;background:#fdf6ff;color:#2a1240;font-weight:900;font-size:.65rem;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 2px rgba(0,0,0,.15);}
+
+  /* diagonally-split round token -- light/dark of the team color, split corner to corner */
+  .token{border-radius:999px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:conic-gradient(from 135deg, var(--tk-light) 0deg 180deg, var(--tk-dark) 180deg 360deg);}
+  .token-label{position:relative;font-weight:900;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);}
+  .song-card{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;background:linear-gradient(165deg, color-mix(in oklch, var(--primary), var(--background) 85%), var(--background) 50%);border:2px solid color-mix(in oklch,var(--primary),transparent 50%);}
+  /* the bar lives in its own clipped layer so it stays inside the rounded corners -- WITHOUT clipping the disc badge, which straddles the top edge on purpose. No glow/shine layer, no transparent card surface -- flat, opaque, unified with the rest of the system. */
+  .song-card-fx{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none;z-index:0;}
+  .song-card .bar{position:absolute;inset:0 0 auto 0;height:6px;background:linear-gradient(90deg,var(--primary),var(--secondary),var(--accent));}
+  .song-card > *:not(.song-card-fx){position:relative;z-index:1;}
+  .song-sparkle{position:absolute;pointer-events:none;filter:drop-shadow(0 0 4px currentColor);}
+  /* an actual vinyl disc: fine concentric grooves (single hue, darker/lighter bands for depth -- no rainbow segments), a diagonal light/dark split painted onto the surface like the token's halves (with a bright white seam right on the split line) instead of a glow, and a proper record label with a punched spindle hole dead center.
+     The shadow lives on the outer element and never rotates -- only a .disc-face child spins, so the "this object is sitting above the page, lit from above" cue stays fixed while the vinyl itself turns underneath it, same as a real record. .song-disc never spins (it's a static badge on song cards), so it paints the same face directly with no inner element needed. */
+  .song-disc, .icon-disc, .home-disc .ring{border-radius:999px;position:relative;border:2px solid var(--card);overflow:hidden;}
+  .song-disc{background-image:
+      conic-gradient(from 135deg, rgba(255,255,255,.4) 0deg 177deg, rgba(255,255,255,.95) 177deg 183deg, rgba(0,0,0,.22) 183deg 360deg),
+      repeating-radial-gradient(circle at center, var(--primary) 0px, var(--secondary) 2px, var(--primary) 3.5px);
+    background-blend-mode:overlay,normal;
+    display:flex;align-items:center;justify-content:center;}
+  .disc-face{position:absolute;inset:0;border-radius:999px;background-image:
+      conic-gradient(from 135deg, rgba(255,255,255,.4) 0deg 177deg, rgba(255,255,255,.95) 177deg 183deg, rgba(0,0,0,.22) 183deg 360deg),
+      repeating-radial-gradient(circle at center, var(--primary) 0px, var(--secondary) 2px, var(--primary) 3.5px);
+    background-blend-mode:overlay,normal;}
+  .icon-disc .disc-face{animation:spin 6s linear infinite;}
+  .home-disc .ring .disc-face{animation:spin 5s linear infinite;}
+  .song-disc::after, .icon-disc::after, .home-disc .ring::after{content:"";position:absolute;inset:32%;border-radius:999px;z-index:1;background:radial-gradient(circle at center, color-mix(in oklch,#fdf6ff,black 8%) 0 8%, #fdf6ff 9% 100%);box-shadow:inset 0 1px 2px rgba(0,0,0,.15);}
+
+  .type-row{display:flex;align-items:baseline;gap:16px;padding:12px 0;border-bottom:1px solid var(--border);}
+  .type-row:last-child{border-bottom:none;}
+  .type-meta{font-size:.72rem;color:var(--muted-foreground);font-weight:700;width:150px;flex-shrink:0;}
+
+  .shadow-demo{height:90px;border-radius:1.1rem;background:var(--card);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.78rem;color:var(--muted-foreground);}
+
+  /* setup field controls */
+  .field-label{display:flex;align-items:center;gap:6px;font-weight:800;font-size:.82rem;margin-bottom:8px;}
+  .stepper{display:flex;align-items:center;gap:6px;}
+  .stepper-btn{width:32px;height:32px;flex-shrink:0;border-radius:999px;border:2px solid color-mix(in oklch,var(--primary),transparent 60%);background:var(--background);display:flex;align-items:center;justify-content:center;font-weight:900;cursor:pointer;}
+  .stepper-input{width:100%;text-align:center;border-radius:.8rem;border:2px solid var(--border);background:var(--input);padding:6px 4px;font-weight:900;font-size:.9rem;font-family:inherit;color:var(--foreground);}
+  .stepper-sub{font-size:.68rem;font-weight:700;color:var(--muted-foreground);margin-bottom:3px;display:block;}
+
+  .switch{width:46px;height:26px;border-radius:999px;border:2px solid var(--border);background:var(--muted);position:relative;cursor:pointer;box-shadow:0 3px 0 0 var(--border);flex-shrink:0;transition:background .2s,border-color .2s;}
+  .switch .thumb{width:16px;height:16px;border-radius:999px;background:#fff;position:absolute;top:2px;left:2px;box-shadow:0 2px 0 0 rgba(20,10,43,.25);transition:left .2s;}
+  .switch.on{background:var(--primary);border-color:var(--primary);box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);}
+  .switch.on .thumb{left:22px;}
+
+  .radio-option{display:flex;gap:10px;align-items:flex-start;border:2px solid var(--border);border-radius:1rem;padding:10px 12px;background:color-mix(in oklch,var(--muted),transparent 40%);cursor:pointer;flex:1;}
+  .radio-option.selected{border-color:var(--primary);background:color-mix(in oklch,var(--primary),transparent 88%);}
+  .radio-dot{width:20px;height:20px;border-radius:999px;border:2px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;background:var(--background);}
+  .radio-option.selected .radio-dot{border-color:var(--primary);}
+  .radio-dot-fill{width:10px;height:10px;border-radius:999px;background:var(--primary);opacity:0;transform:scale(.4);transition:.15s;}
+  .radio-option.selected .radio-dot-fill{opacity:1;transform:scale(1);}
+
+  /* big timeline */
+  .big-timeline-wrap{position:relative;padding:54px 24px 30px;}
+  .big-timeline-rail{position:absolute;left:6%;right:6%;top:50%;height:4px;transform:translateY(-50%);border-radius:999px;background:color-mix(in oklch, var(--btl-color, var(--border)), transparent 25%);box-shadow:0 2px 0 0 color-mix(in oklch, var(--btl-color, var(--border)), black 30%);z-index:0;}
+  .big-timeline{position:relative;display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap;z-index:1;}
+  .big-timeline-slot{width:90px;height:150px;flex-shrink:0;margin-top:18px;border-radius:1.5rem;border:3px dashed var(--btl-color, var(--border));display:flex;align-items:center;justify-content:center;background:color-mix(in oklch, var(--btl-color, var(--muted)), transparent 90%);animation:pulse-slot 1.6s ease-in-out infinite;}
+  @keyframes pulse-slot{0%,100%{opacity:.6;}50%{opacity:1;}}
+
+  /* teams status panel */
+  /* flat at rest -- border + tinted bg only, no shadow. The shadow is reserved for .active, so the current-turn team is the one thing that visually pops off the row stack instead of every row fighting for the same weight. */
+  .team-status-row{border:2px solid var(--border);border-radius:1rem;padding:10px;background:var(--card);display:flex;flex-direction:column;gap:8px;}
+  .team-status-row.active{border-color:var(--primary);box-shadow:0 4px 0 0 color-mix(in oklch,var(--primary),black 25%);background:color-mix(in oklch,var(--primary),transparent 92%);}
+  .team-status-top{display:flex;align-items:center;gap:10px;}
+  .team-status-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+  .team-status-tag{display:flex;align-items:center;gap:4px;font-size:.64rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:var(--primary);}
+  .team-status-counts{display:flex;gap:12px;font-size:.74rem;font-weight:800;color:var(--muted-foreground);}
+  .team-status-counts .c-tokens{color:var(--secondary);}
+  .team-status-counts .c-cards{color:var(--primary);}
+  .team-mini-timeline{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:3px 4px;}
+  .team-mini-timeline::before{content:"";position:absolute;left:2px;right:2px;top:50%;height:2px;transform:translateY(-50%);border-radius:999px;background:color-mix(in oklch, var(--mtl-color, var(--border)), transparent 15%);z-index:0;}
+  .team-mini-timeline > *{position:relative;z-index:1;}
+
+  /* round actions -- deliberately no pulsing/glow motion, matches the plain "Round actions" component below */
+  .action-tile{flex:1;border:2px solid var(--border);border-radius:1rem;padding:10px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;font-weight:800;font-size:.7rem;text-transform:uppercase;letter-spacing:.02em;background:var(--card);box-shadow:0 3px 0 0 var(--border);color:var(--muted-foreground);cursor:pointer;transition:all .15s;}
+  .action-tile:hover{border-color:color-mix(in oklch,var(--primary),transparent 50%);color:var(--primary);}
+  .action-tile:active{transform:translateY(3px);box-shadow:none;}
+  .action-tile.disabled{opacity:.4;pointer-events:none;}
+
+  /* after-reveal actions: bonus token picker */
+  .current-song-chip{display:inline-flex;align-items:center;gap:8px;border:2px solid var(--border);border-radius:999px;padding:4px 14px 4px 4px;background:var(--card);}
+  .current-song-chip .mini-disc{width:24px;height:24px;border-radius:999px;flex-shrink:0;background:repeating-radial-gradient(circle at center, var(--primary) 0px, var(--secondary) 2px, var(--primary) 3.5px);}
+  .who-called{font-size:.78rem;font-weight:700;color:var(--muted-foreground);margin:2px 0 6px;}
+  .team-pick{display:flex;align-items:center;gap:10px;width:100%;border:2px solid var(--border);border-radius:1rem;padding:8px 10px;background:color-mix(in oklch,var(--muted),transparent 55%);opacity:.7;cursor:pointer;transition:all .15s;}
+  .team-pick:hover{opacity:1;}
+  .team-pick.selected{opacity:1;border-color:var(--tp-color);background:color-mix(in oklch,var(--tp-color),transparent 88%);box-shadow:0 3px 0 0 color-mix(in oklch,var(--tp-color),black 25%);}
+  .team-pick-check{margin-left:auto;width:20px;height:20px;border-radius:999px;background:var(--tp-color);display:none;align-items:center;justify-content:center;color:#fff;font-size:.65rem;font-weight:900;flex-shrink:0;}
+  .team-pick.selected .team-pick-check{display:flex;}
+
+  /* scan for audio / qr display */
+  .scan-label{display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:var(--primary);}
+  /* songcard-like: same tinted-gradient body, top bar and straddling disc badge as .song-card, and colorable via --qr-color (defaults to primary, but can pick up the current team's color). The actual scan surface inside stays fixed cream/ink -- never theme-tokenized -- so it keeps scanning reliably in both themes. */
+  .qr-panel{position:relative;width:fit-content;border-radius:1.5rem;border:2px solid color-mix(in oklch,var(--qr-color, var(--primary)),transparent 50%);background:linear-gradient(165deg, color-mix(in oklch, var(--qr-color, var(--primary)), var(--background) 85%), var(--background) 50%);padding:16px;box-shadow:0 5px 0 0 color-mix(in oklch,var(--qr-color, var(--primary)),black 20%);}
+  .qr-panel-fx{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none;}
+  .qr-panel .bar{position:absolute;inset:0 0 auto 0;height:6px;background:linear-gradient(90deg,var(--primary),var(--secondary),var(--accent));}
+  .qr-panel-surface{position:relative;margin-top:14px;background:#fdf9ff;border-radius:1rem;padding:10px;box-shadow:inset 0 1px 3px rgba(0,0,0,.12);}
+  .qr-empty{aspect-ratio:1;width:132px;border-radius:1.5rem;border:2px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:10px;color:var(--muted-foreground);}
+
+  /* round winner panel */
+  .round-winner{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;overflow:hidden;border-radius:1.1rem;border:2px solid var(--rw-color);padding:14px 20px;text-align:center;background:linear-gradient(150deg, color-mix(in oklch, var(--rw-color), white 25%), color-mix(in oklch, var(--rw-color), black 10%));box-shadow:0 5px 0 0 color-mix(in oklch, var(--rw-color), black 35%);}
+  .round-winner-shine{position:absolute;inset:0;background:radial-gradient(circle at 30% 15%, rgba(255,255,255,.5), transparent 55%);pointer-events:none;}
+  .round-winner-badge{position:relative;width:36px;height:36px;border-radius:999px;border:2px solid rgba(255,255,255,.5);background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.1rem;animation:wiggle 1.2s ease-in-out infinite;}
+  .round-winner-tag{position:relative;display:flex;align-items:center;gap:5px;font-size:.68rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.9);}
+  .round-winner-name{position:relative;font-size:1.3rem;font-weight:900;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.3);}
+  .no-winner{display:flex;align-items:center;gap:8px;border:2px dashed var(--border);border-radius:1rem;background:color-mix(in oklch,var(--muted),transparent 40%);padding:10px 14px;font-size:.78rem;font-weight:700;color:var(--muted-foreground);}
+
+  /* team list item */
+  .team-item{display:flex;align-items:center;gap:10px;border:2px solid var(--border);border-radius:1rem;padding:8px 10px 8px 6px;background:color-mix(in oklch,var(--muted),transparent 45%);}
+  .team-disc{border-radius:999px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid var(--card);overflow:hidden;background-image:
+      conic-gradient(from 135deg, rgba(255,255,255,.4) 0deg 177deg, rgba(255,255,255,.95) 177deg 183deg, rgba(0,0,0,.22) 183deg 360deg),
+      repeating-radial-gradient(circle at center, var(--td-color) 0px, color-mix(in oklch, var(--td-color), black 25%) 2px, var(--td-color) 3.5px);
+    background-blend-mode:overlay,normal;
+    box-shadow:0 2px 0 0 color-mix(in oklch, var(--td-color), black 35%);}
+  .team-disc::after{content:"";position:absolute;inset:30%;border-radius:999px;background:#fdf6ff;box-shadow:inset 0 1px 2px rgba(0,0,0,.15);}
+  .team-disc-label{position:relative;font-weight:900;font-size:.62rem;color:#2a1240;}
+  .icon-ghost{width:30px;height:30px;flex-shrink:0;border-radius:999px;border:2px solid transparent;background:transparent;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.85rem;cursor:pointer;color:var(--foreground);}
+  .icon-ghost:hover{background:var(--muted);}
+  .icon-ghost.grab{cursor:grab;color:var(--muted-foreground);font-size:.95rem;}
+  .icon-ghost.danger:hover{background:color-mix(in oklch,var(--destructive),transparent 85%);color:var(--destructive);}
+
+  /* header actions -- settings + end game are plain ghost icons (.icon-ghost, already defined above), the theme switcher gets its own bordered circular treatment so it reads as the one always-visible control */
+  .theme-btn{width:36px;height:36px;flex-shrink:0;border-radius:999px;border:2px solid color-mix(in oklch,var(--primary),transparent 70%);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--foreground);box-shadow:0 2px 0 0 var(--border);transition:all .15s;}
+  .theme-btn:hover{border-color:var(--primary);background:color-mix(in oklch,var(--primary),transparent 90%);}
+
+  /* dialogs -- a card-family panel, not a new box language: same border+radius+frosted-blur
+     recipe as .card, just centered over a dimmed scrim, with the top gradient bar every "hero"
+     surface (song-card, qr-panel, winner-card) shares, and the hard press shadow instead of a
+     glow. The footer is a distinct muted strip so actions always sit in the same place. */
+  .dialog-backdrop{position:relative;border-radius:1.6rem;background:rgba(20,10,43,.55);padding:36px 20px;display:flex;justify-content:center;}
+  .dialog{position:relative;width:100%;max-width:420px;border-radius:1.6rem;border:2px solid color-mix(in oklch,var(--primary),transparent 70%);background:var(--popover);backdrop-filter:blur(14px);box-shadow:0 8px 0 0 var(--border);padding:20px;overflow:hidden;max-height:min(560px,80vh);display:flex;flex-direction:column;}
+  .dialog-bar{position:absolute;inset:0 0 auto 0;height:6px;background:linear-gradient(90deg,var(--primary),var(--secondary),var(--accent));}
+  .dialog-close{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:999px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;color:var(--muted-foreground);cursor:pointer;}
+  .dialog-close:hover{background:var(--muted);}
+  .dialog-header{display:flex;align-items:center;gap:10px;margin-top:6px;margin-bottom:16px;flex-shrink:0;}
+  .dialog-icon{width:36px;height:36px;flex-shrink:0;border-radius:999px;border:2px solid var(--dg-color, var(--primary));background:color-mix(in oklch,var(--dg-color, var(--primary)),transparent 90%);display:flex;align-items:center;justify-content:center;color:var(--dg-color, var(--primary));box-shadow:0 3px 0 0 color-mix(in oklch,var(--dg-color, var(--primary)),black 25%);}
+  .dialog-title{font-size:1.05rem;font-weight:900;letter-spacing:-.01em;}
+  .dialog-body{display:flex;flex-direction:column;gap:16px;overflow-y:auto;padding-right:2px;}
+  .dialog-subhead{display:flex;align-items:center;gap:6px;font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:var(--foreground);}
+  .dialog-footer{display:flex;justify-content:flex-end;gap:8px;margin:16px -20px -20px;padding:14px 20px;border-top:1px solid var(--border);background:color-mix(in oklch,var(--muted),transparent 40%);flex-shrink:0;}
+  .color-swatch-btn{border:none;background:none;padding:0;cursor:pointer;border-radius:999px;opacity:.4;transform:scale(.88);transition:all .15s;}
+  .color-swatch-btn:hover{opacity:.8;}
+  .color-swatch-btn.selected{opacity:1;transform:scale(1);box-shadow:0 0 0 3px var(--popover),0 0 0 5px var(--ring);border-radius:999px;}
+  /* two-column dialog body (Game settings) -- each field stays its own .card, same as the
+     Setup-controls gallery, just laid out in two labeled groups instead of a 3-col grid. */
+  .dialog-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .dialog-col{display:flex;flex-direction:column;gap:12px;}
+  @media(max-width:560px){.dialog-cols{grid-template-columns:1fr;}}
+
+  /* unified team-name treatment -- every team name anywhere in the app uses this, only color + size change per context */
+  /* sticker outline: bold, upright, colored fill with a light stroke so it pops off any background like a sticker */
+  .team-name{
+    font-weight:900;
+    font-style:normal;
+    letter-spacing:-.01em;
+    color:var(--tn-color);
+    -webkit-text-stroke:1.2px #fdf6ff;
+    paint-order:stroke fill;
+    filter:drop-shadow(0 1px 0 rgba(20,10,43,.3));
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-block;max-width:100%;
+  }
+
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @keyframes token-float{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-6px) rotate(2deg);}}
+  @keyframes wiggle{0%,100%{transform:rotate(-4deg);}50%{transform:rotate(4deg);}}
+  @keyframes pop-in{0%{transform:scale(.6);opacity:0;}70%{transform:scale(1.08);opacity:1;}100%{transform:scale(1);}}
+  @keyframes ping{75%,100%{transform:scale(1.4);opacity:0;}}
+
+  /* ---------- screen mockups ---------- */
+  .device{border:3px solid var(--border);border-radius:1.6rem;overflow:hidden;background:var(--background);box-shadow:0 20px 50px -20px rgba(0,0,0,.4), 0 0 0 6px color-mix(in oklch, var(--card), transparent 40%);}
+  .device-inner{min-height:640px;display:flex;flex-direction:column;position:relative;}
+
+  /* App background -- one smooth diagonal gradient through the brand palette
+     (violet -> cyan -> hero pink) over the theme's base background, plus a
+     handful of big, low-opacity, gently animated icons. Nothing else -- same
+     recipe as the real Home screen's decorative layer. */
+  .app-bg{background:linear-gradient(150deg,
+      color-mix(in oklch, var(--secondary), var(--background) 78%) 0%,
+      color-mix(in oklch, var(--accent), var(--background) 82%) 45%,
+      color-mix(in oklch, var(--primary), var(--background) 76%) 100%);}
+  .app-bg-icons{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
+  .app-bg-icons svg{position:absolute;display:block;}
+  .screen-bg-demo{height:200px;border-radius:1.3rem;border:2px solid var(--border);position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:14px 16px;box-shadow:0 6px 0 0 var(--border);}
+  .screen-bg-demo span{position:relative;z-index:1;font-weight:900;font-size:.78rem;letter-spacing:.02em;color:var(--muted-foreground);background:var(--card);border:2px solid var(--border);padding:4px 10px;border-radius:999px;}
+  .screen-header{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:2px solid var(--border);}
+  .screen-header .left{display:flex;align-items:center;gap:8px;font-weight:900;font-size:1rem;}
+  /* header brand mark -- the same three-ring disc as .song-disc/.home-disc .ring, just header-sized. Every screen with a header uses this one mark. Ring pattern + white center defined once, above, and shared via the grouped selector. */
+  .icon-disc{width:22px;height:22px;flex-shrink:0;box-shadow:0 1px 0 0 color-mix(in oklch,var(--primary),black 30%);}
+  .screen-body{position:relative;z-index:1;flex:1;padding:24px;}
+  .screen-tag{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-foreground);margin-bottom:8px;}
+
+  /* home */
+  .home-hero{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:28px;padding-top:60px;}
+  .home-disc{width:88px;height:88px;border-radius:2rem;border:2px solid var(--primary);background:color-mix(in oklch,var(--primary),transparent 90%);display:flex;align-items:center;justify-content:center;box-shadow:0 5px 0 0 color-mix(in oklch,var(--primary),black 30%);animation:token-float 4s ease-in-out infinite;}
+  /* the logo is the same three-ring disc as .song-disc -- the app icon and every song card share one visual language. Ring pattern + white center defined once, above. */
+  .home-disc .ring{width:48px;height:48px;box-shadow:0 2px 0 0 color-mix(in oklch,var(--primary),black 30%);}
+  .home-title{font-size:2.6rem;font-weight:900;letter-spacing:-.03em;}
+  .home-title .grad{background:linear-gradient(90deg,var(--primary),var(--secondary),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .home-sub{font-size:.85rem;font-weight:700;color:var(--muted-foreground);margin-top:6px;}
+  .home-actions{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;}
+
+  /* setup */
+  .setup-grid{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:14px;}
+
+  /* game */
+  .game-columns{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:12px;margin-top:14px;}
+
+  /* end */
+  .winner-card{border:2px solid var(--primary);border-radius:1.4rem;background:var(--card);box-shadow:0 6px 0 0 color-mix(in oklch,var(--primary),black 25%);overflow:hidden;text-align:center;}
+  .winner-bar{height:8px;background:linear-gradient(90deg,var(--primary),var(--secondary),var(--accent));}
+
+  code{background:var(--muted);color:var(--foreground);padding:2px 6px;border-radius:6px;font-size:.75rem;}
+  .note{font-size:.78rem;color:var(--muted-foreground);font-weight:600;line-height:1.5;margin-top:6px;}
+  .flag{display:inline-block;background:var(--accent);color:var(--accent-foreground);font-size:.65rem;font-weight:900;padding:2px 8px;border-radius:999px;margin-left:8px;text-transform:uppercase;letter-spacing:.03em;vertical-align:middle;}
+</style>
+</head>
+<body>
+
+<div class="bg-decor" aria-hidden="true">
+  <svg style="top:6%;left:7%;width:26px;height:26px;color:var(--team-pink);opacity:.35;animation-duration:7s;animation-delay:0s;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-6.7-4.35-9.3-8.1C1 10.5 1.5 7 4.6 5.6 7 4.5 9.5 5.3 12 8c2.5-2.7 5-3.5 7.4-2.4C22.5 7 23 10.5 21.3 12.9 18.7 16.65 12 21 12 21Z"/></svg>
+  <svg style="top:12%;left:84%;width:32px;height:32px;color:var(--team-cyan);opacity:.3;animation-duration:8.5s;animation-delay:.6s;" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 14.9 8.6 22 9.3 16.5 14 18.2 21 12 17.3 5.8 21 7.5 14 2 9.3 9.1 8.6 12 2"/></svg>
+  <svg style="top:36%;left:3%;width:22px;height:22px;color:var(--secondary);opacity:.32;animation-duration:6s;animation-delay:1.1s;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"/></svg>
+  <svg style="top:52%;left:93%;width:28px;height:28px;color:var(--team-yellow);opacity:.32;animation-duration:9s;animation-delay:.3s;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-6.7-4.35-9.3-8.1C1 10.5 1.5 7 4.6 5.6 7 4.5 9.5 5.3 12 8c2.5-2.7 5-3.5 7.4-2.4C22.5 7 23 10.5 21.3 12.9 18.7 16.65 12 21 12 21Z"/></svg>
+  <svg style="top:68%;left:9%;width:30px;height:30px;color:var(--primary);opacity:.3;animation-duration:7.5s;animation-delay:.9s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+  <svg style="top:80%;left:78%;width:24px;height:24px;color:var(--team-purple);opacity:.34;animation-duration:6.8s;animation-delay:1.4s;" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 14.9 8.6 22 9.3 16.5 14 18.2 21 12 17.3 5.8 21 7.5 14 2 9.3 9.1 8.6 12 2"/></svg>
+  <svg style="top:26%;left:48%;width:20px;height:20px;color:var(--accent);opacity:.3;animation-duration:5.5s;animation-delay:.2s;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"/></svg>
+  <svg style="top:90%;left:38%;width:26px;height:26px;color:var(--team-lime);opacity:.3;animation-duration:8s;animation-delay:.7s;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-6.7-4.35-9.3-8.1C1 10.5 1.5 7 4.6 5.6 7 4.5 9.5 5.3 12 8c2.5-2.7 5-3.5 7.4-2.4C22.5 7 23 10.5 21.3 12.9 18.7 16.65 12 21 12 21Z"/></svg>
+</div>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="icon-disc" style="width:34px;height:34px;box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 30%);"><span class="disc-face"></span></span> Candy Neon — Style Guide</div>
+    <div class="tabs" id="tabs">
+      <button class="tab-btn active" data-tab="tokens">Tokens</button>
+      <button class="tab-btn" data-tab="components">Components</button>
+      <button class="tab-btn" data-tab="screens">Screens</button>
+    </div>
+    <div class="theme-switch">
+      <button id="btn-light" class="active" onclick="setTheme(false)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"></path></svg> Light</button>
+      <button id="btn-dark" onclick="setTheme(true)"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"></path></svg> Dark</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ===================== TOKENS ===================== -->
+<section id="tokens" class="active">
+  <h2 class="section-title">Brand colors</h2>
+  <p class="section-sub">Bubblegum pink, electric violet, neon cyan. Never pure black or pure white anywhere in the app.</p>
+  <div class="grid grid-cols-5">
+    <div class="swatch"><div class="swatch-color" style="background:var(--primary)"></div><div class="swatch-label"><div class="swatch-name">Primary</div><div class="swatch-hex">Bubblegum pink</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--secondary)"></div><div class="swatch-label"><div class="swatch-name">Secondary</div><div class="swatch-hex">Electric violet</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--accent)"></div><div class="swatch-label"><div class="swatch-name">Accent</div><div class="swatch-hex">Neon cyan</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--destructive)"></div><div class="swatch-label"><div class="swatch-name">Destructive</div><div class="swatch-hex">Warning red</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--background)"></div><div class="swatch-label"><div class="swatch-name">Background</div><div class="swatch-hex">Never pure white/black</div></div></div>
+  </div>
+
+  <h2 class="section-title">Surfaces &amp; text</h2>
+  <div class="grid grid-cols-5">
+    <div class="swatch"><div class="swatch-color" style="background:var(--card)"></div><div class="swatch-label"><div class="swatch-name">Card</div><div class="swatch-hex">Frosted panel</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--muted)"></div><div class="swatch-label"><div class="swatch-name">Muted</div><div class="swatch-hex">Neutral surface</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--foreground);"></div><div class="swatch-label"><div class="swatch-name">Foreground</div><div class="swatch-hex">Body text/ink</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--muted-foreground);"></div><div class="swatch-label"><div class="swatch-name">Muted text</div><div class="swatch-hex">Secondary text</div></div></div>
+    <div class="swatch"><div class="swatch-color;" style="background:var(--border)"></div><div class="swatch-label"><div class="swatch-name">Border</div><div class="swatch-hex">Tinted, 2px standard</div></div></div>
+  </div>
+
+  <h2 class="section-title">Team colors <span class="flag">10 max teams</span></h2>
+  <p class="section-sub">Assigned round-robin per team; every team-owned element (name, token, timeline card) is tinted to this color.</p>
+  <div class="grid grid-cols-5">
+    <div class="swatch"><div class="swatch-color" style="background:var(--team-red)"></div><div class="swatch-label"><div class="swatch-name">Red</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--team-blue)"></div><div class="swatch-label"><div class="swatch-name">Blue</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--team-green)"></div><div class="swatch-label"><div class="swatch-name">Green</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--team-yellow)"></div><div class="swatch-label"><div class="swatch-name">Yellow</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--team-purple)"></div><div class="swatch-label"><div class="swatch-name">Purple</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--team-orange)"></div><div class="swatch-label"><div class="swatch-name">Orange</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--team-pink)"></div><div class="swatch-label"><div class="swatch-name">Pink</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--team-cyan)"></div><div class="swatch-label"><div class="swatch-name">Cyan</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--team-lime)"></div><div class="swatch-label"><div class="swatch-name">Lime</div></div></div>
+    <div class="swatch"><div class="swatch-color" style="background:var(--team-white)"></div><div class="swatch-label"><div class="swatch-name">White</div></div></div>
+  </div>
+
+  <h2 class="section-title">Typography</h2>
+  <p class="section-sub">Sora Variable everywhere — extra bold/black weights for the "extra" energy, never a thin weight.</p>
+  <div class="card">
+    <div class="type-row"><div class="type-meta">Display / 900</div><div style="font-size:2.4rem;font-weight:900;letter-spacing:-.03em;">MUSIC GAME</div></div>
+    <div class="type-row"><div class="type-meta">H1 / 900</div><div style="font-size:1.8rem;font-weight:900;letter-spacing:-.02em;">Game Setup</div></div>
+    <div class="type-row"><div class="type-meta">H2 / 800 uppercase</div><div style="font-size:.85rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;">Teams</div></div>
+    <div class="type-row"><div class="type-meta">Body / 600</div><div style="font-size:.95rem;font-weight:600;">Guess the year. Race the timeline. Steal the win.</div></div>
+    <div class="type-row"><div class="type-meta">Caption / 700</div><div style="font-size:.78rem;font-weight:700;color:var(--muted-foreground);">8 songs match your filters</div></div>
+    <div class="type-row"><div class="type-meta">Team name <span class="flag">unified</span></div><span class="team-name" style="--tn-color:var(--primary);font-size:1.1rem;">The Vinyl Vixens</span></div>
+  </div>
+
+  <h2 class="section-title">The disc</h2>
+  <p class="section-sub">Fine vinyl grooves, a real record label with a punched spindle hole, and a diagonal light/dark split painted onto the surface -- like the token's two halves, with a bright white seam right on the split line -- instead of a glow. The split is what makes the spin readable, since plain concentric rings look identical at every angle. The shadow lives on the outer static ring; only the groove face underneath it turns, so the drop shadow never swings around.</p>
+  <div class="card" style="display:flex;gap:32px;align-items:center;flex-wrap:wrap;">
+    <div style="text-align:center;">
+      <div class="home-disc" style="width:96px;height:96px;margin:0 auto;"><div class="ring" style="width:52px;height:52px;"><span class="disc-face"></span></div></div>
+      <span class="note">Home logo</span>
+    </div>
+    <div style="text-align:center;">
+      <span class="icon-disc" style="width:36px;height:36px;display:inline-block;"><span class="disc-face"></span></span>
+      <p class="note">Header mark</p>
+    </div>
+    <div style="text-align:center;">
+      <span class="song-disc" style="width:56px;height:56px;box-shadow:0 4px 0 0 color-mix(in oklch,var(--primary),black 25%);display:inline-flex;"></span>
+      <p class="note">Song card badge<br>(static, no spin)</p>
+    </div>
+  </div>
+
+  <h2 class="section-title">Radius scale</h2>
+  <div class="grid grid-cols-4">
+    <div class="shadow-demo" style="border-radius:.6rem;">radius-sm · chips/handles</div>
+    <div class="shadow-demo" style="border-radius:1.1rem;">radius-lg · cards/inputs</div>
+    <div class="shadow-demo" style="border-radius:1.6rem;">radius-xl · dialogs/hero</div>
+    <div class="shadow-demo" style="border-radius:999px;">full · buttons/badges/tokens</div>
+  </div>
+
+  <h2 class="section-title">Shadow system <span class="flag">unified</span></h2>
+  <p class="section-sub">One rule, no exceptions: every surface gets a flat, colored 3D press shadow. There is no glow/blur shadow anywhere in the app anymore — "selected" or "current" states are shown with a colored border plus a stronger tinted press shadow, never a soft halo.</p>
+  <div class="grid grid-cols-3">
+    <div class="shadow-demo" style="box-shadow:0 6px 0 0 var(--border);">Resting · neutral border shadow</div>
+    <div class="shadow-demo" style="border-color:var(--primary);box-shadow:0 6px 0 0 color-mix(in oklch,var(--primary),black 25%);">Selected · primary border + tinted shadow</div>
+    <div class="shadow-demo" style="box-shadow:0 0 0 0 transparent;transform:translateY(6px);">Pressed · shadow collapses to 0</div>
+  </div>
+  <p class="section-sub" style="margin-top:14px;margin-bottom:0;"><strong>Boxes, unified:</strong> a bordered panel (<code>.card</code>) is the only "box" a screen needs. Rows/items living inside one (team rows, radio options, team list items) stay flat at rest — border + tinted background, no shadow of their own — so they don't fight the panel's shadow. Shadow is added back only for two reasons: it's a button (<code>.action-tile</code> always has one), or it's the one row that matters right now (<code>.active</code> team, <code>.selected</code> teammate). Standalone panels that aren't a list of rows -- <code>.round-winner</code>, <code>.qr-panel</code>, the hero <code>.winner-card</code> -- keep their own shadow since nothing contains them. Dead box variants from earlier drafts (old team/medal rows, the compact timeline strip) have been removed so there's one component per job.</p>
+
+  <h2 class="section-title">Screen background</h2>
+  <p class="section-sub">One smooth diagonal gradient through the brand palette (violet &rarr; cyan &rarr; hero pink) over the theme's base background, plus a handful of big, low-opacity, gently animated icons -- nothing else. Same recipe as the real Home screen's decorative layer. One shared class, <code>.app-bg</code> (+ <code>.app-bg-icons</code>), drives every screen below -- change it once, every screen updates.</p>
+  <div class="screen-bg-demo app-bg">
+    <div class="app-bg-icons" aria-hidden="true">
+      <svg style="width:130px;height:130px;left:-30px;top:-20px;color:color-mix(in oklch, var(--primary), transparent 90%);animation:spin 18s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><path d="M12 8v-4"></path></svg>
+      <svg style="width:52px;height:52px;right:20px;top:18px;color:color-mix(in oklch, var(--secondary), transparent 80%);transform:rotate(12deg);animation:token-float 4s ease-in-out infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+      <svg style="width:60px;height:60px;left:30px;bottom:-10px;color:color-mix(in oklch, var(--accent), transparent 80%);transform:rotate(-12deg);animation:token-float 5s ease-in-out infinite;animation-delay:.6s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"></path></svg>
+      <svg style="width:32px;height:32px;right:48px;bottom:20px;color:color-mix(in oklch, var(--primary), transparent 75%);animation:pop-in 2.4s ease-in-out infinite;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"></path></svg>
+    </div>
+    <span>.app-bg -- gradient + big icons</span>
+  </div>
+</section>
+
+<!-- ===================== COMPONENTS ===================== -->
+<section id="components">
+  <h2 class="section-title">Buttons</h2>
+  <div class="card" style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+    <button class="btn btn-default"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg> Start New Game</button>
+    <button class="btn btn-secondary">Secondary</button>
+    <button class="btn btn-outline">Outline</button>
+    <button class="btn btn-ghost">Ghost</button>
+    <button class="btn btn-destructive">Remove team</button>
+    <button class="btn btn-default btn-sm">Small</button>
+    <button class="btn btn-default btn-lg">Large</button>
+    <button class="btn btn-outline" disabled>Disabled</button>
+    <button class="btn btn-outline btn-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg></button>
+  </div>
+
+  <h2 class="section-title">Badges &amp; pills</h2>
+  <div class="card" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+    <span class="badge badge-primary"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z"></path></svg> 3 tokens</span>
+    <span class="badge badge-secondary">Round 4</span>
+    <span class="badge badge-accent">Spotify</span>
+    <span class="badge badge-outline">Local files</span>
+  </div>
+
+  <h2 class="section-title">Selector pills (genre / rules toggles)</h2>
+  <div class="card">
+    <div class="pill-toggle">
+      <button class="pill selected">Pop</button>
+      <button class="pill">Rock</button>
+      <button class="pill">Hip-Hop</button>
+      <button class="pill selected">Dance</button>
+      <button class="pill">Indie</button>
+      <button class="pill">Metal</button>
+    </div>
+  </div>
+
+  <h2 class="section-title">Inputs, checkbox <span class="flag">fixed</span></h2>
+  <p class="section-sub">Checkbox was the one leftover sharp-cornered shadcn default in the codebase — squared up to <code>rounded-[.6rem]</code> with a glow ring to match everything else.</p>
+  <div class="card" style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;">
+    <input class="input" style="max-width:220px;" placeholder="Team name…" />
+    <div class="checkbox checked"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polyline points="20 6 9 17 4 12"></polyline></svg></div>
+    <div class="checkbox"></div>
+    <span style="font-weight:700;font-size:.82rem;">Explicit lyrics allowed</span>
+  </div>
+
+  <h2 class="section-title">Cards</h2>
+  <div class="grid grid-cols-3">
+    <div class="card"><div class="swatch-name" style="font-size:.9rem;">Standard card</div><p class="note">border-2, 2px hard-drop border shadow, frosted blur backdrop.</p></div>
+    <div class="card" style="border-color:var(--primary);box-shadow:0 6px 0 0 color-mix(in oklch,var(--primary),black 25%);"><div class="swatch-name" style="font-size:.9rem;">Selected / active state</div><p class="note">Primary border + a stronger tinted press shadow — no glow.</p></div>
+    <div class="card" style="text-align:center;"><div class="token" style="width:56px;height:56px;margin:0 auto 10px;--tk-light:color-mix(in oklch, var(--team-purple), white 35%);--tk-dark:color-mix(in oklch, var(--team-purple), black 25%);box-shadow:0 0 0 2px var(--card), 0 3px 0 0 color-mix(in oklch, var(--team-purple), black 35%);"><span class="token-label" style="font-size:.7rem;">TV</span></div><div class="swatch-name" style="font-size:.9rem;">Team token</div></div>
+  </div>
+
+  <h2 class="section-title">Team tokens <span class="flag">updated</span></h2>
+  <p class="section-sub">Diagonally-split round tokens — light half / dark half of the team's own color, split corner to corner. Static badge (team identity), draggable "mystery card" (question mark), draggable "steal token" (bolt).</p>
+  <div class="card" style="display:flex;gap:28px;align-items:center;flex-wrap:wrap;">
+    <div style="text-align:center;">
+      <div class="token" style="width:64px;height:64px;--tk-light:color-mix(in oklch, var(--team-pink), white 35%);--tk-dark:color-mix(in oklch, var(--team-pink), black 25%);box-shadow:0 0 0 2px var(--card), 0 4px 0 0 color-mix(in oklch, var(--team-pink), black 35%);margin:0 auto 8px;animation:token-float 4s ease-in-out infinite;"><span class="token-label">TV</span></div>
+      <span class="note">Team badge</span>
+    </div>
+    <div style="text-align:center;">
+      <div style="width:64px;height:64px;border-radius:1.4rem;border:2px solid rgba(255,255,255,.4);background:conic-gradient(from 135deg, color-mix(in oklch, var(--team-cyan), white 35%) 0deg 180deg, color-mix(in oklch, var(--team-cyan), black 25%) 180deg 360deg);box-shadow:0 5px 0 0 rgba(20,10,43,.35);position:relative;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;animation:token-float 3s ease-in-out infinite;">
+        <span style="font-size:.65rem;font-weight:900;color:white;text-shadow:0 1px 2px rgba(0,0,0,.35);">DJ</span>
+        <span style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:999px;background:var(--accent);border:2px solid rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:900;color:var(--accent-foreground);animation:wiggle 1.4s ease-in-out infinite;">?</span>
+      </div>
+      <span class="note">Mystery card</span>
+    </div>
+    <div style="text-align:center;">
+      <div style="width:64px;height:64px;border-radius:1.4rem;border:2px solid rgba(255,255,255,.4);background:conic-gradient(from 135deg, color-mix(in oklch, var(--team-lime), white 35%) 0deg 180deg, color-mix(in oklch, var(--team-lime), black 25%) 180deg 360deg);box-shadow:0 5px 0 0 rgba(20,10,43,.35);position:relative;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;animation:token-float 3s ease-in-out infinite .3s;">
+        <span style="font-size:.65rem;font-weight:900;color:white;text-shadow:0 1px 2px rgba(0,0,0,.35);">SQ</span>
+        <span style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:999px;background:var(--secondary);border:2px solid rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:900;color:white;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z"></path></svg></span>
+      </div>
+      <span class="note">Steal token</span>
+    </div>
+  </div>
+
+  <h2 class="section-title">Song cards <span class="flag">no glow, opaque</span></h2>
+  <p class="section-sub">Rounder corners, a warm tinted gradient instead of a flat card face, and a gentle bob so every card feels alive instead of static -- no glow/shine highlight, and the surface is fully opaque now instead of a see-through frosted card.</p>
+  <div class="card" style="display:flex;gap:30px;align-items:flex-end;flex-wrap:wrap;padding:32px 24px;">
+    <div style="text-align:center;">
+      <div class="song-card" style="width:62px;padding:14px 6px 10px;border-radius:1.1rem;box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 20%);transform:rotate(-4deg);animation:token-float 3.4s ease-in-out infinite;">
+        <span class="song-card-fx"><span class="bar"></span></span>
+        <span style="position:relative;font-size:1.1rem;font-weight:900;">1999</span>
+      </div>
+      <span class="note">Small</span>
+    </div>
+    <div style="text-align:center;">
+      <div class="song-card" style="width:148px;padding:22px 12px 16px;border-radius:1.5rem;margin-top:18px;box-shadow:0 5px 0 0 color-mix(in oklch,var(--primary),black 20%);transform:rotate(3deg);animation:token-float 4s ease-in-out infinite .2s;">
+        <span class="song-card-fx"><span class="bar"></span></span>
+        <span class="song-disc" style="width:34px;height:34px;position:absolute;top:-17px;left:50%;transform:translateX(-50%);box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+        <span class="song-sparkle" style="top:8px;right:10px;font-size:.75rem;color:var(--accent);animation:pop-in 2.2s ease-in-out infinite;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"></path></svg></span>
+        <span style="position:relative;font-size:1.4rem;font-weight:900;margin-top:10px;">1999</span>
+        <span style="position:relative;font-size:.74rem;font-weight:800;">TLC</span>
+        <span style="position:relative;font-size:.68rem;color:var(--muted-foreground);">No Scrubs</span>
+      </div>
+      <span class="note">Medium</span>
+    </div>
+    <div style="text-align:center;">
+      <div class="song-card" style="width:236px;padding:36px 22px 24px;border-radius:2rem;box-shadow:0 7px 0 0 color-mix(in oklch,var(--primary),black 25%);transform:rotate(-2deg);animation:token-float 5s ease-in-out infinite .1s;">
+        <span class="song-card-fx"><span class="bar" style="height:8px;"></span></span>
+        <span class="song-sparkle" style="top:16px;left:18px;font-size:1.15rem;color:var(--accent);animation:pop-in 2s ease-in-out infinite;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"></path></svg></span>
+        <span class="song-sparkle" style="bottom:20px;right:20px;font-size:.85rem;color:var(--secondary);animation:pop-in 2.6s ease-in-out infinite .3s;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></span>
+        <span class="song-sparkle" style="top:20px;right:26px;font-size:.7rem;color:var(--primary);animation:token-float 2.6s ease-in-out infinite .4s;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></span>
+        <span class="song-disc" style="width:66px;height:66px;margin-bottom:14px;box-shadow:0 4px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+        <span style="position:relative;font-size:2.7rem;font-weight:900;letter-spacing:-.02em;background:linear-gradient(90deg,var(--primary),var(--secondary));-webkit-background-clip:text;background-clip:text;color:transparent;">1999</span>
+        <span style="position:relative;font-size:.92rem;font-weight:800;margin-top:6px;">TLC</span>
+        <span style="position:relative;font-size:.78rem;color:var(--muted-foreground);">No Scrubs</span>
+      </div>
+      <span class="note">Large</span>
+    </div>
+  </div>
+
+  <h2 class="section-title">Big timeline <span class="flag">new</span></h2>
+  <p class="section-sub">A larger, centered version of the timeline for moments that deserve more room: the medium song card (disc badge, year, artist, title) strung along a rail, tinted to whichever team's timeline is showing, with an open dashed slot marking where the next card can land.</p>
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:8px;justify-content:center;margin-bottom:6px;">
+      <span class="note" style="margin:0;">Now showing</span>
+      <div class="team-disc" style="width:24px;height:24px;--td-color:var(--team-pink);"><span class="team-disc-label" style="font-size:.4rem;">VV</span></div>
+      <span class="team-name" style="--tn-color:var(--team-pink);font-size:.85rem;">The Vinyl Vixens</span>
+    </div>
+
+    <div class="big-timeline-wrap" style="--btl-color:var(--team-pink);">
+      <div class="big-timeline-rail"></div>
+      <div class="big-timeline">
+        <div class="song-card" style="width:148px;padding:22px 12px 16px;border-radius:1.5rem;margin-top:18px;box-shadow:0 5px 0 0 color-mix(in oklch,var(--primary),black 20%);transform:rotate(-3deg);animation:token-float 4.2s ease-in-out infinite;">
+          <span class="song-card-fx"><span class="bar"></span></span>
+          <span class="song-disc" style="width:34px;height:34px;position:absolute;top:-17px;left:50%;transform:translateX(-50%);box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+          <span style="position:relative;font-size:1.4rem;font-weight:900;margin-top:10px;">1985</span>
+          <span style="position:relative;font-size:.74rem;font-weight:800;">Tears For Fears</span>
+          <span style="position:relative;font-size:.68rem;color:var(--muted-foreground);">Everybody Wants to Rule the World</span>
+        </div>
+
+        <div class="song-card" style="width:148px;padding:22px 12px 16px;border-radius:1.5rem;margin-top:18px;box-shadow:0 5px 0 0 color-mix(in oklch,var(--primary),black 20%);transform:rotate(2deg);animation:token-float 3.6s ease-in-out infinite .2s;">
+          <span class="song-card-fx"><span class="bar"></span></span>
+          <span class="song-disc" style="width:34px;height:34px;position:absolute;top:-17px;left:50%;transform:translateX(-50%);box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+          <span class="song-sparkle" style="top:8px;right:10px;font-size:.7rem;color:var(--accent);animation:pop-in 2.2s ease-in-out infinite;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"></path></svg></span>
+          <span style="position:relative;font-size:1.4rem;font-weight:900;margin-top:10px;">1999</span>
+          <span style="position:relative;font-size:.74rem;font-weight:800;">TLC</span>
+          <span style="position:relative;font-size:.68rem;color:var(--muted-foreground);">No Scrubs</span>
+        </div>
+
+        <div class="big-timeline-slot">
+          <div class="token" style="width:56px;height:56px;--tk-light:color-mix(in oklch, var(--team-pink), white 35%);--tk-dark:color-mix(in oklch, var(--team-pink), black 25%);box-shadow:0 0 0 2px var(--card), 0 3px 0 0 color-mix(in oklch, var(--team-pink), black 35%);opacity:.9;animation:token-float 3s ease-in-out infinite;"><span class="token-label" style="font-size:.9rem;">?</span></div>
+        </div>
+
+        <div class="song-card" style="width:148px;padding:22px 12px 16px;border-radius:1.5rem;margin-top:18px;box-shadow:0 5px 0 0 color-mix(in oklch,var(--primary),black 20%);transform:rotate(-2deg);animation:token-float 4s ease-in-out infinite .4s;">
+          <span class="song-card-fx"><span class="bar"></span></span>
+          <span class="song-disc" style="width:34px;height:34px;position:absolute;top:-17px;left:50%;transform:translateX(-50%);box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+          <span style="position:relative;font-size:1.4rem;font-weight:900;margin-top:10px;">2015</span>
+          <span style="position:relative;font-size:.74rem;font-weight:800;">The Weeknd</span>
+          <span style="position:relative;font-size:.68rem;color:var(--muted-foreground);">Can't Feel My Face</span>
+        </div>
+      </div>
+    </div>
+    <p class="note" style="text-align:center;">The rail and the open slot both pick up <code>--btl-color</code> — set it to the current team's color and everything follows.</p>
+  </div>
+
+  <h2 class="section-title">Teams panel <span class="flag">new</span></h2>
+  <p class="section-sub">The live team roster during a game. The active team is unmissable — bigger shadow, primary border, a "Now playing" tag, and their mystery card waiting on the right. Every other team shows the same color + name treatment as Setup, their card and token counts, their mini timeline in small song cards, and their steal token on the right.</p>
+  <div class="card" style="display:flex;flex-direction:column;gap:10px;max-width:440px;">
+    <h2 style="display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:900;letter-spacing:.02em;text-transform:uppercase;color:var(--foreground);"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Teams</h2>
+
+    <div class="team-status-row active">
+      <div class="team-status-top">
+        <div class="team-disc" style="width:38px;height:38px;--td-color:var(--team-pink);"><span class="team-disc-label">TV</span></div>
+        <div class="team-status-info">
+          <span class="team-status-tag"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4M8 22h8"></path></svg> Now playing</span>
+          <span class="team-name" style="--tn-color:var(--team-pink);font-size:.95rem;">The Vinyl Vixens</span>
+          <span class="team-status-counts">
+            <span class="c-tokens"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z"></path></svg> 3</span>
+            <span class="c-cards"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="12 2 22 8.5 12 15 2 8.5 12 2"></polygon><polyline points="2 14.5 12 21 22 14.5"></polyline></svg> 4</span>
+          </span>
+        </div>
+        <div style="width:52px;height:52px;border-radius:1.1rem;border:2px solid rgba(255,255,255,.4);background:conic-gradient(from 135deg, color-mix(in oklch, var(--team-pink), white 35%) 0deg 180deg, color-mix(in oklch, var(--team-pink), black 25%) 180deg 360deg);box-shadow:0 4px 0 0 rgba(20,10,43,.35);position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:token-float 3s ease-in-out infinite;">
+          <span style="font-size:.55rem;font-weight:900;color:white;text-shadow:0 1px 2px rgba(0,0,0,.35);">TV</span>
+          <span style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:999px;background:var(--accent);border:2px solid rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:900;color:var(--accent-foreground);animation:wiggle 1.4s ease-in-out infinite;">?</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="team-status-row">
+      <div class="team-status-top">
+        <div class="team-disc" style="width:34px;height:34px;--td-color:var(--team-cyan);"><span class="team-disc-label" style="font-size:.55rem;">SQ</span></div>
+        <div class="team-status-info">
+          <span class="team-name" style="--tn-color:var(--team-cyan);font-size:.9rem;">Synth Squad</span>
+          <span class="team-status-counts">
+            <span class="c-tokens"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z"></path></svg> 1</span>
+            <span class="c-cards"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="12 2 22 8.5 12 15 2 8.5 12 2"></polygon><polyline points="2 14.5 12 21 22 14.5"></polyline></svg> 3</span>
+          </span>
+        </div>
+        <div style="width:46px;height:46px;border-radius:1rem;border:2px solid rgba(255,255,255,.4);background:conic-gradient(from 135deg, color-mix(in oklch, var(--team-cyan), white 35%) 0deg 180deg, color-mix(in oklch, var(--team-cyan), black 25%) 180deg 360deg);box-shadow:0 4px 0 0 rgba(20,10,43,.35);position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:token-float 3s ease-in-out infinite .3s;">
+          <span style="font-size:.5rem;font-weight:900;color:white;text-shadow:0 1px 2px rgba(0,0,0,.35);">SQ</span>
+          <span style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:999px;background:var(--secondary);border:2px solid rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:900;color:#fff;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z"></path></svg></span>
+        </div>
+      </div>
+      <div class="team-mini-timeline" style="--mtl-color:var(--team-cyan);">
+        <div class="song-card" style="width:44px;padding:8px 4px 6px;border-radius:.7rem;box-shadow:0 2px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+          <span class="song-card-fx"><span class="bar" style="height:4px;"></span></span>
+          <span style="position:relative;font-size:.75rem;font-weight:900;">1998</span>
+        </div>
+        <div class="song-card" style="width:44px;padding:8px 4px 6px;border-radius:.7rem;box-shadow:0 2px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+          <span class="song-card-fx"><span class="bar" style="height:4px;"></span></span>
+          <span style="position:relative;font-size:.75rem;font-weight:900;">2004</span>
+        </div>
+        <div class="song-card" style="width:44px;padding:8px 4px 6px;border-radius:.7rem;box-shadow:0 2px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+          <span class="song-card-fx"><span class="bar" style="height:4px;"></span></span>
+          <span style="position:relative;font-size:.75rem;font-weight:900;">2019</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2 class="section-title">Team summary <span class="flag">new</span></h2>
+  <p class="section-sub">The end-of-game ranking. Same disc + name + counts as the Teams panel, but no action token on the right — nothing to steal or reveal anymore — and the small mini-timeline is replaced by the big timeline treatment, showing every card the team collected.</p>
+  <div class="card" style="display:flex;flex-direction:column;gap:14px;max-width:640px;">
+
+    <div class="team-status-row" style="border-color:var(--team-pink);box-shadow:0 4px 0 0 color-mix(in oklch,var(--team-pink),black 25%);">
+      <div class="team-status-top">
+        <span style="font-size:1.05rem;animation:wiggle 2s ease-in-out infinite;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><circle cx="12" cy="15" r="6"></circle><path d="m9 10-4-7M15 10l4-7M12 12v6"></path></svg></span>
+        <div class="team-disc" style="width:34px;height:34px;--td-color:var(--team-pink);"><span class="team-disc-label" style="font-size:.55rem;">VV</span></div>
+        <div class="team-status-info">
+          <span class="team-name" style="--tn-color:var(--team-pink);font-size:.92rem;">The Vinyl Vixens</span>
+          <span class="team-status-counts">
+            <span class="c-tokens"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z"></path></svg> 2</span>
+            <span class="c-cards"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="12 2 22 8.5 12 15 2 8.5 12 2"></polygon><polyline points="2 14.5 12 21 22 14.5"></polyline></svg> 10</span>
+          </span>
+        </div>
+      </div>
+      <div class="big-timeline-wrap" style="--btl-color:var(--team-pink);padding:54px 4px 4px;">
+        <div class="big-timeline-rail"></div>
+        <div class="big-timeline" style="justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;gap:16px;">
+          <div class="song-card" style="width:148px;padding:22px 12px 16px;border-radius:1.5rem;margin-top:18px;flex-shrink:0;box-shadow:0 5px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+            <span class="song-card-fx"><span class="bar"></span></span>
+            <span class="song-disc" style="width:34px;height:34px;position:absolute;top:-17px;left:50%;transform:translateX(-50%);box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+            <span style="position:relative;font-size:1.4rem;font-weight:900;margin-top:10px;">1985</span>
+            <span style="position:relative;font-size:.74rem;font-weight:800;">Tears For Fears</span>
+            <span style="position:relative;font-size:.68rem;color:var(--muted-foreground);">Everybody Wants to Rule the World</span>
+          </div>
+          <div class="song-card" style="width:148px;padding:22px 12px 16px;border-radius:1.5rem;margin-top:18px;flex-shrink:0;box-shadow:0 5px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+            <span class="song-card-fx"><span class="bar"></span></span>
+            <span class="song-disc" style="width:34px;height:34px;position:absolute;top:-17px;left:50%;transform:translateX(-50%);box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+            <span style="position:relative;font-size:1.4rem;font-weight:900;margin-top:10px;">1998</span>
+            <span style="position:relative;font-size:.74rem;font-weight:800;">Madonna</span>
+            <span style="position:relative;font-size:.68rem;color:var(--muted-foreground);">Frozen</span>
+          </div>
+          <div class="song-card" style="width:148px;padding:22px 12px 16px;border-radius:1.5rem;margin-top:18px;flex-shrink:0;box-shadow:0 5px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+            <span class="song-card-fx"><span class="bar"></span></span>
+            <span class="song-disc" style="width:34px;height:34px;position:absolute;top:-17px;left:50%;transform:translateX(-50%);box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+            <span style="position:relative;font-size:1.4rem;font-weight:900;margin-top:10px;">2015</span>
+            <span style="position:relative;font-size:.74rem;font-weight:800;">The Weeknd</span>
+            <span style="position:relative;font-size:.68rem;color:var(--muted-foreground);">Can't Feel My Face</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="team-status-row">
+      <div class="team-status-top">
+        <div class="team-disc" style="width:30px;height:30px;--td-color:var(--team-cyan);"><span class="team-disc-label" style="font-size:.5rem;">SQ</span></div>
+        <div class="team-status-info">
+          <span class="team-name" style="--tn-color:var(--team-cyan);font-size:.88rem;">Synth Squad</span>
+          <span class="team-status-counts">
+            <span class="c-tokens"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z"></path></svg> 1</span>
+            <span class="c-cards"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="12 2 22 8.5 12 15 2 8.5 12 2"></polygon><polyline points="2 14.5 12 21 22 14.5"></polyline></svg> 7</span>
+          </span>
+        </div>
+      </div>
+      <div class="big-timeline-wrap" style="--btl-color:var(--team-cyan);padding:54px 4px 4px;">
+        <div class="big-timeline-rail"></div>
+        <div class="big-timeline" style="justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;gap:16px;">
+          <div class="song-card" style="width:148px;padding:22px 12px 16px;border-radius:1.5rem;margin-top:18px;flex-shrink:0;box-shadow:0 5px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+            <span class="song-card-fx"><span class="bar"></span></span>
+            <span class="song-disc" style="width:34px;height:34px;position:absolute;top:-17px;left:50%;transform:translateX(-50%);box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+            <span style="position:relative;font-size:1.4rem;font-weight:900;margin-top:10px;">1999</span>
+            <span style="position:relative;font-size:.74rem;font-weight:800;">TLC</span>
+            <span style="position:relative;font-size:.68rem;color:var(--muted-foreground);">No Scrubs</span>
+          </div>
+          <div class="song-card" style="width:148px;padding:22px 12px 16px;border-radius:1.5rem;margin-top:18px;flex-shrink:0;box-shadow:0 5px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+            <span class="song-card-fx"><span class="bar"></span></span>
+            <span class="song-disc" style="width:34px;height:34px;position:absolute;top:-17px;left:50%;transform:translateX(-50%);box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+            <span style="position:relative;font-size:1.4rem;font-weight:900;margin-top:10px;">2019</span>
+            <span style="position:relative;font-size:.74rem;font-weight:800;">Billie Eilish</span>
+            <span style="position:relative;font-size:.68rem;color:var(--muted-foreground);">Bad Guy</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2 class="section-title">Scan for audio (QR display) <span class="flag">songcard-like</span></h2>
+  <p class="section-sub">Shown mid-round before the solution is revealed: a wiggling "Scan for audio" label over a QR panel that now shares the song card's language -- tinted gradient body, top bar, a straddling disc badge -- and picks up a color via <code>--qr-color</code> (here, the current team's). The scan surface itself stays fixed cream/ink, never theme-tokenized, so it keeps scanning reliably in both themes. Plus the empty state for when no track is loaded yet.</p>
+  <div class="card" style="display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;">
+    <div style="text-align:center;">
+      <span class="scan-label" style="justify-content:center;margin-bottom:8px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M11 5 6 9H2v6h4l5 4V5Z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg> Scan for audio</span>
+      <div class="qr-panel" style="--qr-color:var(--team-cyan);">
+        <span class="qr-panel-fx"><span class="bar"></span></span>
+        <span class="song-disc" style="width:34px;height:34px;position:absolute;top:-17px;left:50%;transform:translateX(-50%);box-shadow:0 3px 0 0 color-mix(in oklch,var(--team-cyan),black 25%);"></span>
+        <div class="qr-panel-surface">
+        <svg viewBox="0 0 100 100" width="132" height="132">
+          <rect x="6" y="6" width="22" height="22" rx="5" fill="none" stroke="#201640" stroke-width="4"/>
+          <rect x="14" y="14" width="6" height="6" rx="1.5" fill="#201640"/>
+          <rect x="72" y="6" width="22" height="22" rx="5" fill="none" stroke="#201640" stroke-width="4"/>
+          <rect x="80" y="14" width="6" height="6" rx="1.5" fill="#201640"/>
+          <rect x="6" y="72" width="22" height="22" rx="5" fill="none" stroke="#201640" stroke-width="4"/>
+          <rect x="14" y="80" width="6" height="6" rx="1.5" fill="#201640"/>
+          <g fill="#201640">
+            <rect x="36" y="10" width="5" height="5" rx="1.2"/>
+            <rect x="48" y="10" width="5" height="5" rx="1.2"/>
+            <rect x="60" y="16" width="5" height="5" rx="1.2"/>
+            <rect x="36" y="22" width="5" height="5" rx="1.2"/>
+            <rect x="54" y="28" width="5" height="5" rx="1.2"/>
+            <rect x="42" y="36" width="5" height="5" rx="1.2"/>
+            <rect x="60" y="38" width="5" height="5" rx="1.2"/>
+            <rect x="76" y="42" width="5" height="5" rx="1.2"/>
+            <rect x="86" y="36" width="5" height="5" rx="1.2"/>
+            <rect x="10" y="42" width="5" height="5" rx="1.2"/>
+            <rect x="20" y="48" width="5" height="5" rx="1.2"/>
+            <rect x="34" y="54" width="5" height="5" rx="1.2"/>
+            <rect x="48" y="50" width="5" height="5" rx="1.2"/>
+            <rect x="60" y="58" width="5" height="5" rx="1.2"/>
+            <rect x="72" y="60" width="5" height="5" rx="1.2"/>
+            <rect x="86" y="56" width="5" height="5" rx="1.2"/>
+            <rect x="40" y="66" width="5" height="5" rx="1.2"/>
+            <rect x="54" y="72" width="5" height="5" rx="1.2"/>
+            <rect x="66" y="78" width="5" height="5" rx="1.2"/>
+            <rect x="80" y="72" width="5" height="5" rx="1.2"/>
+            <rect x="88" y="84" width="5" height="5" rx="1.2"/>
+            <rect x="42" y="84" width="5" height="5" rx="1.2"/>
+            <rect x="56" y="88" width="5" height="5" rx="1.2"/>
+          </g>
+        </svg>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;">
+      <span class="scan-label" style="justify-content:center;margin-bottom:8px;color:var(--muted-foreground);">No track loaded</span>
+      <div class="qr-empty">
+        <span style="font-size:1.8rem;opacity:.5;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><path d="M14 14h3v3M20 14v.01M14 20v.01M17.5 17.5h.01M20 20v.01"></path></svg></span>
+        <span class="note" style="margin:0;">Waiting for the next round.</span>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title">Revealed song <span class="flag">new</span></h2>
+  <p class="section-sub">What replaces the QR panel the moment the solution is shown: the large song card, then the round winner call-out — a card washed in the winning team's own color, or the plain "no one called it" state when nobody scored.</p>
+  <div class="card" style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start;">
+
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+      <span class="scan-label" style="color:var(--accent);"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"></path></svg> Revealed</span>
+
+      <div class="song-card" style="width:210px;padding:30px 20px 20px;border-radius:1.8rem;box-shadow:0 6px 0 0 color-mix(in oklch,var(--primary),black 25%);">
+        <span class="song-card-fx"><span class="bar" style="height:7px;"></span></span>
+        <span class="song-sparkle" style="top:14px;left:16px;font-size:1rem;color:var(--accent);animation:pop-in 2s ease-in-out infinite;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"></path></svg></span>
+        <span class="song-disc" style="width:50px;height:50px;margin-bottom:12px;box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+        <span style="position:relative;font-size:2.2rem;font-weight:900;letter-spacing:-.02em;">1999</span>
+        <span style="position:relative;font-size:.85rem;font-weight:800;margin-top:4px;">TLC</span>
+        <span style="position:relative;font-size:.72rem;color:var(--muted-foreground);">No Scrubs</span>
+      </div>
+
+      <div class="round-winner" style="--rw-color:var(--team-pink);width:210px;">
+        <span class="round-winner-shine"></span>
+        <span class="round-winner-badge"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"></path><path d="M7 5H4a2 2 0 0 0 0 4h1M17 5h3a2 2 0 0 1 0 4h-1"></path></svg></span>
+        <span class="round-winner-tag"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M5.8 11.3 2 22l10.7-3.79"></path><path d="M4 3h.01M22 8h.01M15 2h.01M22 20h.01"></path><path d="M17.5 8.5c.7-.7.7-2 0-2.7-.7-.7-2-.7-2.7 0M14 6c0-1 1-2 2-2M8 12l6-6"></path></svg> Round winner <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M5.8 11.3 2 22l10.7-3.79"></path><path d="M4 3h.01M22 8h.01M15 2h.01M22 20h.01"></path><path d="M17.5 8.5c.7-.7.7-2 0-2.7-.7-.7-2-.7-2.7 0M14 6c0-1 1-2 2-2M8 12l6-6"></path></svg></span>
+        <span class="round-winner-name">The Vinyl Vixens</span>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <p class="note" style="max-width:200px;">If nobody called the year right this round:</p>
+      <div class="no-winner"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"></path><path d="M7 5H4a2 2 0 0 0 0 4h1M17 5h3a2 2 0 0 1 0 4h-1"></path></svg> No one called it right this round</div>
+    </div>
+
+  </div>
+
+  <h2 class="section-title">After-reveal actions <span class="flag">new</span></h2>
+  <p class="section-sub">What Round actions turns into once the answer is shown: the current song with a button to fix it if the database got it wrong, then "who called it right" — each option reusing the exact disc + name treatment from the team displays, not a re-styled duplicate — and one main button to move on.</p>
+  <div class="card" style="max-width:340px;">
+    <div class="field-label" style="margin-bottom:10px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"></path><path d="M7 5H4a2 2 0 0 0 0 4h1M17 5h3a2 2 0 0 1 0 4h-1"></path></svg> Bonus token</div>
+
+    <div class="current-song-chip" style="margin-bottom:14px;width:100%;justify-content:space-between;">
+      <span style="font-weight:800;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">1999 · TLC · No Scrubs</span>
+      <button class="icon-ghost" style="width:26px;height:26px;font-size:.75rem;flex-shrink:0;" aria-label="Edit song info if incorrect"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg></button>
+    </div>
+
+    <p class="who-called">Who called it right?</p>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+      <button class="team-pick selected" style="--tp-color:var(--team-pink);">
+        <div class="team-disc" style="width:28px;height:28px;--td-color:var(--team-pink);"><span class="team-disc-label" style="font-size:.5rem;">VV</span></div>
+        <span class="team-name" style="--tn-color:var(--team-pink);font-size:.85rem;">The Vinyl Vixens</span>
+        <span class="team-pick-check"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+      </button>
+      <button class="team-pick" style="--tp-color:var(--team-cyan);">
+        <div class="team-disc" style="width:28px;height:28px;--td-color:var(--team-cyan);"><span class="team-disc-label" style="font-size:.5rem;">SQ</span></div>
+        <span class="team-name" style="--tn-color:var(--team-cyan);font-size:.85rem;">Synth Squad</span>
+        <span class="team-pick-check"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+      </button>
+    </div>
+
+    <button class="btn btn-default btn-lg" style="width:100%;">Next round <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg></button>
+  </div>
+
+  <h2 class="section-title">Round actions <span class="flag">new</span></h2>
+  <p class="section-sub">Deliberately plain — one clear primary action, three equal secondary actions below it. No pulsing rings or extra motion here; the timeline, tokens and song cards already carry the "extra" energy, this panel just needs to be fast to read mid-round.</p>
+  <div class="card" style="max-width:320px;">
+    <div class="field-label" style="margin-bottom:12px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"></path></svg> Round actions</div>
+
+    <button class="btn btn-default btn-lg" style="width:100%;margin-bottom:10px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg> Reveal answer</button>
+
+    <div style="display:flex;gap:8px;">
+      <button class="action-tile" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <span style="font-size:1rem;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg></span>Play
+      </button>
+      <button class="action-tile" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <span style="font-size:1rem;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="m18 4 3 3-3 3"></path><path d="M2 7h4.9a4 4 0 0 1 3.3 1.8l.9 1.3"></path><path d="m18 20 3-3-3-3"></path><path d="M2 17h4.9a4 4 0 0 0 3.3-1.8l4.6-6.4A4 4 0 0 1 18 7H21"></path><path d="M21 17h-3a4 4 0 0 1-3.3-1.8"></path></svg></span>New song
+      </button>
+      <button class="action-tile" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <span style="font-size:1rem;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"></path><path d="M22 21H7"></path><path d="m5 11 9 9"></path></svg></span>Reset tokens
+      </button>
+    </div>
+  </div>
+
+  <h2 class="section-title">Setup controls <span class="flag">new</span></h2>
+  <p class="section-sub">The six fields on the Setup screen, each its own component. Music playback is simplified to a single Spotify on/off switch (off falls back to QR-code play), and Final round rule now shows real radio dots instead of hiding the input.</p>
+  <div class="grid grid-cols-3">
+
+    <div class="card">
+      <div class="field-label"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg> Release year range</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div>
+          <span class="stepper-sub">After</span>
+          <div class="stepper">
+            <div class="stepper-btn">−</div>
+            <input class="stepper-input" value="1985" />
+            <div class="stepper-btn">+</div>
+          </div>
+        </div>
+        <div>
+          <span class="stepper-sub">Before</span>
+          <div class="stepper">
+            <div class="stepper-btn">−</div>
+            <input class="stepper-input" value="2024" />
+            <div class="stepper-btn">+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="field-label"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="12 2 22 8.5 12 15 2 8.5 12 2"></polygon><polyline points="2 14.5 12 21 22 14.5"></polyline></svg> Songs per year</div>
+      <div class="stepper">
+        <div class="stepper-btn">−</div>
+        <input class="stepper-input" value="3" />
+        <div class="stepper-btn">+</div>
+      </div>
+      <p class="note">Leave empty for unlimited.</p>
+    </div>
+
+    <div class="card">
+      <div class="field-label"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z"></path></svg> Starting steal tokens</div>
+      <div class="stepper">
+        <div class="stepper-btn">−</div>
+        <input class="stepper-input" value="3" />
+        <div class="stepper-btn">+</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="field-label"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"></path><path d="M7 5H4a2 2 0 0 0 0 4h1M17 5h3a2 2 0 0 1 0 4h-1"></path></svg> Cards to win</div>
+      <div class="stepper">
+        <div class="stepper-btn">−</div>
+        <input class="stepper-input" value="10" />
+        <div class="stepper-btn">+</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="field-label"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"></path></svg> Music playback <span class="flag">simplified</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <div>
+          <div style="font-weight:800;font-size:.82rem;">Spotify playback</div>
+          <div class="note" style="margin-top:2px;">On: auto-plays through a connected device.<br>Off: players scan a QR code instead.</div>
+        </div>
+        <div class="switch on" onclick="this.classList.toggle('on')"><div class="thumb"></div></div>
+      </div>
+      <div style="margin-top:10px;"><span class="badge badge-accent"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polyline points="20 6 9 17 4 12"></polyline></svg> Connected as nelli</span></div>
+    </div>
+
+    <div class="card">
+      <div class="field-label"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><line x1="10" y1="2" x2="14" y2="2"></line><line x1="12" y1="14" x2="12" y2="8"></line><circle cx="12" cy="14" r="8"></circle></svg> Final round rule <span class="flag">radio</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="radio-option"><div class="radio-dot"><div class="radio-dot-fill"></div></div><div><div style="font-weight:800;font-size:.8rem;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M4 22V4"></path><path d="M4 4h14l-2.5 4L18 12H4"></path></svg> End immediately</div><div class="note" style="margin-top:1px;">Game stops the moment a team hits the win condition.</div></div></div>
+        <div class="radio-option selected"><div class="radio-dot"><div class="radio-dot-fill"></div></div><div><div style="font-weight:800;font-size:.8rem;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 3v6h-6"></path></svg> Finish the round</div><div class="note" style="margin-top:1px;">Every team gets an equal number of turns first.</div></div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2 class="section-title">Team list item <span class="flag">new</span></h2>
+  <p class="section-sub">The row for each added team on Setup: grab handle to reorder, a vinyl disc tinted to the team's color (same motif as the song card disc, not the diagonal-split token), the team name in its glow treatment, then edit and delete.</p>
+  <div class="card" style="display:flex;flex-direction:column;gap:8px;max-width:420px;">
+    <div class="team-item">
+      <button class="icon-ghost grab" aria-label="Drag to reorder"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><circle cx="9" cy="5" r="1.4"></circle><circle cx="9" cy="12" r="1.4"></circle><circle cx="9" cy="19" r="1.4"></circle><circle cx="15" cy="5" r="1.4"></circle><circle cx="15" cy="12" r="1.4"></circle><circle cx="15" cy="19" r="1.4"></circle></svg></button>
+      <div class="team-disc" style="width:40px;height:40px;--td-color:var(--team-pink);"><span class="team-disc-label">TV</span></div>
+      <div style="flex:1;min-width:0;"><span class="team-name" style="--tn-color:var(--team-pink);font-size:.92rem;">The Vinyl Vixens</span></div>
+      <button class="icon-ghost" aria-label="Edit team"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg></button>
+      <button class="icon-ghost danger" aria-label="Remove team"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+    </div>
+    <div class="team-item">
+      <button class="icon-ghost grab" aria-label="Drag to reorder"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><circle cx="9" cy="5" r="1.4"></circle><circle cx="9" cy="12" r="1.4"></circle><circle cx="9" cy="19" r="1.4"></circle><circle cx="15" cy="5" r="1.4"></circle><circle cx="15" cy="12" r="1.4"></circle><circle cx="15" cy="19" r="1.4"></circle></svg></button>
+      <div class="team-disc" style="width:40px;height:40px;--td-color:var(--team-cyan);"><span class="team-disc-label">SQ</span></div>
+      <div style="flex:1;min-width:0;"><span class="team-name" style="--tn-color:var(--team-cyan);font-size:.92rem;">Synth Squad</span></div>
+      <button class="icon-ghost" aria-label="Edit team"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg></button>
+      <button class="icon-ghost danger" aria-label="Remove team"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+    </div>
+  </div>
+
+  <h2 class="section-title">Dialogs <span class="flag">new</span></h2>
+  <p class="section-sub">One dialog language, reused for both: a card-family panel (same border, radius and frosted blur as <code>.card</code>) centered over a dimmed scrim, with the top gradient bar every hero surface shares and a hard press shadow instead of a glow. A round icon badge names what the dialog is for, and the footer is a distinct muted strip so Cancel/Save always land in the same place.</p>
+  <div style="display:flex;flex-direction:column;gap:28px;">
+
+    <div style="max-width:420px;margin:0 auto;width:100%;">
+      <div class="dialog-backdrop">
+        <div class="dialog" style="max-width:360px;--dg-color:var(--secondary);">
+          <span class="dialog-bar"></span>
+          <button class="dialog-close" aria-label="Close"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+          <div class="dialog-header">
+            <span class="dialog-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg></span>
+            <span class="dialog-title">Edit team</span>
+          </div>
+          <div class="dialog-body">
+            <div>
+              <div class="field-label">Team name</div>
+              <input class="input" value="The Vinyl Vixens" />
+            </div>
+            <div>
+              <div class="field-label">Team color</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                <button class="color-swatch-btn"><div class="team-disc" style="width:36px;height:36px;--td-color:var(--team-red);"></div></button>
+                <button class="color-swatch-btn"><div class="team-disc" style="width:36px;height:36px;--td-color:var(--team-blue);"></div></button>
+                <button class="color-swatch-btn"><div class="team-disc" style="width:36px;height:36px;--td-color:var(--team-green);"></div></button>
+                <button class="color-swatch-btn"><div class="team-disc" style="width:36px;height:36px;--td-color:var(--team-yellow);"></div></button>
+                <button class="color-swatch-btn selected"><div class="team-disc" style="width:36px;height:36px;--td-color:var(--team-pink);"></div></button>
+                <button class="color-swatch-btn"><div class="team-disc" style="width:36px;height:36px;--td-color:var(--team-cyan);"></div></button>
+                <button class="color-swatch-btn"><div class="team-disc" style="width:36px;height:36px;--td-color:var(--team-lime);"></div></button>
+                <button class="color-swatch-btn"><div class="team-disc" style="width:36px;height:36px;--td-color:var(--team-orange);"></div></button>
+              </div>
+            </div>
+          </div>
+          <div class="dialog-footer">
+            <button class="btn btn-outline btn-sm">Cancel</button>
+            <button class="btn btn-default btn-sm">Save changes</button>
+          </div>
+        </div>
+      </div>
+      <p class="note" style="text-align:center;">Edit team -- name input, then the same team-disc swatches used everywhere else, ring-highlighted when selected.</p>
+    </div>
+
+    <div>
+      <div class="dialog-backdrop">
+        <div class="dialog" style="max-width:680px;--dg-color:var(--primary);">
+          <span class="dialog-bar"></span>
+          <button class="dialog-close" aria-label="Close"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+          <div class="dialog-header">
+            <span class="dialog-icon"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg></span>
+            <span class="dialog-title">Game settings</span>
+          </div>
+          <div class="dialog-body">
+            <div class="dialog-cols">
+
+              <div class="card dialog-col">
+                <div class="dialog-subhead"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> Music configuration</div>
+
+                <div class="pill-toggle"><button class="pill selected">Pop</button><button class="pill">Rock</button><button class="pill">Hip-Hop</button><button class="pill selected">Dance</button><button class="pill">Indie</button></div>
+
+                <div>
+                  <div class="field-label" style="font-size:.72rem;margin-bottom:6px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg> Release year range</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                    <div>
+                      <span class="stepper-sub">After</span>
+                      <div class="stepper"><div class="stepper-btn">−</div><input class="stepper-input" value="1985" /><div class="stepper-btn">+</div></div>
+                    </div>
+                    <div>
+                      <span class="stepper-sub">Before</span>
+                      <div class="stepper"><div class="stepper-btn">−</div><input class="stepper-input" value="2024" /><div class="stepper-btn">+</div></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="field-label" style="font-size:.72rem;margin-bottom:6px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="12 2 22 8.5 12 15 2 8.5 12 2"></polygon><polyline points="2 14.5 12 21 22 14.5"></polyline></svg> Songs per year</div>
+                  <div class="stepper"><div class="stepper-btn">−</div><input class="stepper-input" value="3" /><div class="stepper-btn">+</div></div>
+                </div>
+
+                <div>
+                  <div class="field-label" style="font-size:.72rem;margin-bottom:6px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"></path></svg> Music playback</div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                    <span class="note" style="margin:0;font-size:.72rem;">Spotify playback</span>
+                    <div class="switch on" style="width:38px;height:22px;"><div class="thumb" style="width:14px;height:14px;"></div></div>
+                  </div>
+                  <div style="margin-top:6px;"><span class="badge badge-accent"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polyline points="20 6 9 17 4 12"></polyline></svg> Connected</span></div>
+                </div>
+              </div>
+
+              <div class="card dialog-col">
+                <div class="dialog-subhead"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg> Gameplay rules</div>
+
+                <div>
+                  <div class="field-label" style="font-size:.72rem;margin-bottom:6px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"></path><path d="M7 5H4a2 2 0 0 0 0 4h1M17 5h3a2 2 0 0 1 0 4h-1"></path></svg> Cards to win</div>
+                  <div class="stepper"><div class="stepper-btn">−</div><input class="stepper-input" value="10" /><div class="stepper-btn">+</div></div>
+                </div>
+
+                <div>
+                  <div class="field-label" style="font-size:.72rem;margin-bottom:6px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><line x1="10" y1="2" x2="14" y2="2"></line><line x1="12" y1="14" x2="12" y2="8"></line><circle cx="12" cy="14" r="8"></circle></svg> Final round rule</div>
+                  <div style="display:flex;flex-direction:column;gap:6px;">
+                    <div class="radio-option" style="padding:7px 9px;"><div class="radio-dot" style="width:16px;height:16px;"><div class="radio-dot-fill" style="width:8px;height:8px;"></div></div><div style="font-weight:800;font-size:.72rem;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M4 22V4"></path><path d="M4 4h14l-2.5 4L18 12H4"></path></svg> End immediately</div></div>
+                    <div class="radio-option selected" style="padding:7px 9px;"><div class="radio-dot" style="width:16px;height:16px;"><div class="radio-dot-fill" style="width:8px;height:8px;"></div></div><div style="font-weight:800;font-size:.72rem;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 3v6h-6"></path></svg> Finish the round</div></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div class="dialog-footer">
+            <button class="btn btn-outline btn-sm">Cancel</button>
+            <button class="btn btn-default btn-sm">Save changes</button>
+          </div>
+        </div>
+      </div>
+      <p class="note" style="text-align:center;">Game settings -- two columns, Music configuration and Gameplay rules, each one big card holding its fields flat (no per-field boxing) -- same box-unification rule as everywhere else, just applied to a dialog.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===================== SCREENS ===================== -->
+<section id="screens">
+  <h2 class="section-title">Home</h2>
+  <div class="device"><div class="device-inner app-bg">
+    <div class="app-bg-icons" aria-hidden="true">
+      <svg style="width:160px;height:160px;left:-40px;top:64px;color:color-mix(in oklch, var(--primary), transparent 90%);animation:spin 18s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><path d="M12 8v-4"></path></svg>
+      <svg style="width:64px;height:64px;right:24px;top:96px;color:color-mix(in oklch, var(--secondary), transparent 80%);transform:rotate(12deg);animation:token-float 4s ease-in-out infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+      <svg style="width:80px;height:80px;left:40px;bottom:64px;color:color-mix(in oklch, var(--accent), transparent 80%);transform:rotate(-12deg);animation:token-float 5s ease-in-out infinite;animation-delay:.6s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"></path></svg>
+      <svg style="width:40px;height:40px;right:64px;bottom:112px;color:color-mix(in oklch, var(--primary), transparent 75%);animation:pop-in 2.4s ease-in-out infinite;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"></path></svg>
+      <svg style="width:32px;height:32px;left:32px;top:50%;color:color-mix(in oklch, var(--primary), transparent 85%);transform:rotate(-6deg);animation:token-float 3.6s ease-in-out infinite;animation-delay:1.2s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+    </div>
+    <button class="theme-btn" aria-label="Toggle theme" style="position:absolute;top:20px;right:20px;z-index:2;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"></path></svg></button>
+    <div class="home-hero">
+      <div class="home-disc"><div class="ring"><span class="disc-face"></span></div></div>
+      <div>
+        <h1 class="home-title">MUSIC <span class="grad">GAME</span></h1>
+        <p class="home-sub">Guess the year. Race the timeline. Steal the win.</p>
+      </div>
+      <div class="home-actions">
+        <button class="btn btn-default btn-lg"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg> Start New Game</button>
+        <button class="btn btn-outline btn-lg" disabled><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M21 15V6M18.5 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM12 6h9M12 12h9M12 18h6"></path></svg> Continue Last Game</button>
+      </div>
+    </div>
+  </div></div>
+
+  <h2 class="section-title">Setup</h2>
+  <div class="device"><div class="device-inner app-bg">
+    <div class="app-bg-icons" aria-hidden="true">
+      <svg style="width:160px;height:160px;left:-40px;top:64px;color:color-mix(in oklch, var(--primary), transparent 90%);animation:spin 18s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><path d="M12 8v-4"></path></svg>
+      <svg style="width:64px;height:64px;right:24px;top:96px;color:color-mix(in oklch, var(--secondary), transparent 80%);transform:rotate(12deg);animation:token-float 4s ease-in-out infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+      <svg style="width:80px;height:80px;left:40px;bottom:64px;color:color-mix(in oklch, var(--accent), transparent 80%);transform:rotate(-12deg);animation:token-float 5s ease-in-out infinite;animation-delay:.6s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"></path></svg>
+      <svg style="width:40px;height:40px;right:64px;bottom:112px;color:color-mix(in oklch, var(--primary), transparent 75%);animation:pop-in 2.4s ease-in-out infinite;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"></path></svg>
+      <svg style="width:32px;height:32px;left:32px;top:50%;color:color-mix(in oklch, var(--primary), transparent 85%);transform:rotate(-6deg);animation:token-float 3.6s ease-in-out infinite;animation-delay:1.2s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+    </div>
+    <div class="screen-header"><div class="left"><span class="icon-disc"><span class="disc-face"></span></span> Game Setup</div><button class="theme-btn" aria-label="Toggle theme"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"></path></svg></button></div>
+    <div class="screen-body">
+      <div class="setup-grid">
+        <div class="card" style="gap:14px;">
+          <div class="screen-tag"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> Music</div>
+          <div class="pill-toggle"><button class="pill selected">Pop</button><button class="pill">Rock</button><button class="pill selected">Dance</button></div>
+
+          <div>
+            <div class="field-label" style="font-size:.72rem;margin-bottom:6px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg> Release year range</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div>
+                <span class="stepper-sub">After</span>
+                <div class="stepper"><div class="stepper-btn" style="width:26px;height:26px;">−</div><input class="stepper-input" value="1985" /><div class="stepper-btn" style="width:26px;height:26px;">+</div></div>
+              </div>
+              <div>
+                <span class="stepper-sub">Before</span>
+                <div class="stepper"><div class="stepper-btn" style="width:26px;height:26px;">−</div><input class="stepper-input" value="2024" /><div class="stepper-btn" style="width:26px;height:26px;">+</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="field-label" style="font-size:.72rem;margin-bottom:6px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="12 2 22 8.5 12 15 2 8.5 12 2"></polygon><polyline points="2 14.5 12 21 22 14.5"></polyline></svg> Songs per year</div>
+            <div class="stepper"><div class="stepper-btn" style="width:26px;height:26px;">−</div><input class="stepper-input" value="3" /><div class="stepper-btn" style="width:26px;height:26px;">+</div></div>
+          </div>
+
+          <div>
+            <div class="field-label" style="font-size:.72rem;margin-bottom:6px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"></path></svg> Music playback</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+              <span class="note" style="margin:0;font-size:.72rem;">Spotify playback</span>
+              <div class="switch on" style="width:38px;height:22px;"><div class="thumb" style="width:14px;height:14px;"></div></div>
+            </div>
+            <div style="margin-top:6px;"><span class="badge badge-accent"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polyline points="20 6 9 17 4 12"></polyline></svg> Connected</span></div>
+          </div>
+        </div>
+
+        <div class="card" style="gap:14px;">
+          <div class="screen-tag"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg> Rules</div>
+
+          <div>
+            <div class="field-label" style="font-size:.72rem;margin-bottom:6px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z"></path></svg> Starting steal tokens</div>
+            <div class="stepper"><div class="stepper-btn" style="width:26px;height:26px;">−</div><input class="stepper-input" value="3" /><div class="stepper-btn" style="width:26px;height:26px;">+</div></div>
+          </div>
+
+          <div>
+            <div class="field-label" style="font-size:.72rem;margin-bottom:6px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"></path><path d="M7 5H4a2 2 0 0 0 0 4h1M17 5h3a2 2 0 0 1 0 4h-1"></path></svg> Cards to win</div>
+            <div class="stepper"><div class="stepper-btn" style="width:26px;height:26px;">−</div><input class="stepper-input" value="10" /><div class="stepper-btn" style="width:26px;height:26px;">+</div></div>
+          </div>
+
+          <div>
+            <div class="field-label" style="font-size:.72rem;margin-bottom:6px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><line x1="10" y1="2" x2="14" y2="2"></line><line x1="12" y1="14" x2="12" y2="8"></line><circle cx="12" cy="14" r="8"></circle></svg> Final round rule</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div class="radio-option" style="padding:7px 9px;"><div class="radio-dot" style="width:16px;height:16px;"><div class="radio-dot-fill" style="width:8px;height:8px;"></div></div><div style="font-weight:800;font-size:.72rem;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M4 22V4"></path><path d="M4 4h14l-2.5 4L18 12H4"></path></svg> End immediately</div></div>
+              <div class="radio-option selected" style="padding:7px 9px;"><div class="radio-dot" style="width:16px;height:16px;"><div class="radio-dot-fill" style="width:8px;height:8px;"></div></div><div style="font-weight:800;font-size:.72rem;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 3v6h-6"></path></svg> Finish the round</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="screen-tag"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg> Teams</div>
+          <div style="display:flex;gap:8px;margin-bottom:10px;">
+            <input class="input" placeholder="Add a team…" style="margin:0;" />
+            <button class="btn btn-default btn-icon" aria-label="Add team" style="flex-shrink:0;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+          </div>
+          <div class="team-item" style="padding:6px 6px 6px 4px;margin-bottom:8px;">
+            <button class="icon-ghost grab" style="width:26px;height:26px;font-size:.75rem;" aria-label="Drag to reorder"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><circle cx="9" cy="5" r="1.4"></circle><circle cx="9" cy="12" r="1.4"></circle><circle cx="9" cy="19" r="1.4"></circle><circle cx="15" cy="5" r="1.4"></circle><circle cx="15" cy="12" r="1.4"></circle><circle cx="15" cy="19" r="1.4"></circle></svg></button>
+            <div class="team-disc" style="width:30px;height:30px;--td-color:var(--team-pink);"><span class="team-disc-label" style="font-size:.5rem;">VV</span></div>
+            <div style="flex:1;min-width:0;"><span class="team-name" style="--tn-color:var(--team-pink);font-size:.8rem;">The Vinyl Vixens</span></div>
+            <button class="icon-ghost" style="width:26px;height:26px;font-size:.75rem;" aria-label="Edit team"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg></button>
+            <button class="icon-ghost danger" style="width:26px;height:26px;font-size:.75rem;" aria-label="Remove team"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+          </div>
+          <div class="team-item" style="padding:6px 6px 6px 4px;">
+            <button class="icon-ghost grab" style="width:26px;height:26px;font-size:.75rem;" aria-label="Drag to reorder"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><circle cx="9" cy="5" r="1.4"></circle><circle cx="9" cy="12" r="1.4"></circle><circle cx="9" cy="19" r="1.4"></circle><circle cx="15" cy="5" r="1.4"></circle><circle cx="15" cy="12" r="1.4"></circle><circle cx="15" cy="19" r="1.4"></circle></svg></button>
+            <div class="team-disc" style="width:30px;height:30px;--td-color:var(--team-cyan);"><span class="team-disc-label" style="font-size:.5rem;">SQ</span></div>
+            <div style="flex:1;min-width:0;"><span class="team-name" style="--tn-color:var(--team-cyan);font-size:.8rem;">Synth Squad</span></div>
+            <button class="icon-ghost" style="width:26px;height:26px;font-size:.75rem;" aria-label="Edit team"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg></button>
+            <button class="icon-ghost danger" style="width:26px;height:26px;font-size:.75rem;" aria-label="Remove team"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:14px 24px;border-top:2px solid var(--border);">
+      <button class="btn btn-outline"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Back</button>
+      <button class="btn btn-default">Start Game <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg></button>
+    </div>
+  </div></div>
+
+  <h2 class="section-title">Game</h2>
+  <div class="device"><div class="device-inner app-bg">
+    <div class="app-bg-icons" aria-hidden="true">
+      <svg style="width:160px;height:160px;left:-40px;top:64px;color:color-mix(in oklch, var(--primary), transparent 90%);animation:spin 18s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><path d="M12 8v-4"></path></svg>
+      <svg style="width:64px;height:64px;right:24px;top:96px;color:color-mix(in oklch, var(--secondary), transparent 80%);transform:rotate(12deg);animation:token-float 4s ease-in-out infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+      <svg style="width:80px;height:80px;left:40px;bottom:64px;color:color-mix(in oklch, var(--accent), transparent 80%);transform:rotate(-12deg);animation:token-float 5s ease-in-out infinite;animation-delay:.6s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"></path></svg>
+      <svg style="width:40px;height:40px;right:64px;bottom:112px;color:color-mix(in oklch, var(--primary), transparent 75%);animation:pop-in 2.4s ease-in-out infinite;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"></path></svg>
+      <svg style="width:32px;height:32px;left:32px;top:50%;color:color-mix(in oklch, var(--primary), transparent 85%);transform:rotate(-6deg);animation:token-float 3.6s ease-in-out infinite;animation-delay:1.2s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+    </div>
+    <div class="screen-header"><div class="left"><span class="icon-disc"><span class="disc-face"></span></span> Music Game</div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <button class="icon-ghost" aria-label="Game settings"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg></button>
+        <button class="icon-ghost danger" aria-label="End game"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></button>
+        <button class="theme-btn" aria-label="Toggle theme"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"></path></svg></button>
+      </div>
+    </div>
+    <div class="screen-body">
+      <div class="big-timeline-wrap" style="--btl-color:var(--team-pink);padding:44px 16px 12px;">
+        <div class="big-timeline-rail"></div>
+        <div class="big-timeline" style="gap:14px;">
+          <div class="song-card" style="width:104px;padding:16px 8px 10px;border-radius:1.2rem;margin-top:14px;box-shadow:0 4px 0 0 color-mix(in oklch,var(--primary),black 20%);transform:rotate(-2deg);">
+            <span class="song-card-fx"><span class="bar"></span></span>
+            <span class="song-disc" style="width:26px;height:26px;position:absolute;top:-13px;left:50%;transform:translateX(-50%);box-shadow:0 2px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+            <span style="position:relative;font-size:1.05rem;font-weight:900;margin-top:6px;">1985</span>
+            <span style="position:relative;font-size:.6rem;font-weight:800;">Tears For Fears</span>
+            <span style="position:relative;font-size:.54rem;color:var(--muted-foreground);">Everybody Wants to Rule the World</span>
+          </div>
+          <div class="song-card" style="width:104px;padding:16px 8px 10px;border-radius:1.2rem;margin-top:14px;box-shadow:0 4px 0 0 color-mix(in oklch,var(--primary),black 20%);transform:rotate(2deg);">
+            <span class="song-card-fx"><span class="bar"></span></span>
+            <span class="song-disc" style="width:26px;height:26px;position:absolute;top:-13px;left:50%;transform:translateX(-50%);box-shadow:0 2px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+            <span style="position:relative;font-size:1.05rem;font-weight:900;margin-top:6px;">2004</span>
+            <span style="position:relative;font-size:.6rem;font-weight:800;">Beyoncé</span>
+            <span style="position:relative;font-size:.54rem;color:var(--muted-foreground);">Crazy In Love</span>
+          </div>
+          <div class="big-timeline-slot" style="width:70px;height:112px;margin-top:14px;">
+            <div class="token" style="width:44px;height:44px;--tk-light:color-mix(in oklch, var(--team-pink), white 35%);--tk-dark:color-mix(in oklch, var(--team-pink), black 25%);box-shadow:0 0 0 2px var(--card), 0 2px 0 0 color-mix(in oklch, var(--team-pink), black 35%);opacity:.9;animation:token-float 3s ease-in-out infinite;"><span class="token-label" style="font-size:.7rem;">?</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="game-columns">
+
+        <div class="card" style="gap:8px;">
+          <div class="screen-tag">Teams</div>
+
+          <div class="team-status-row active">
+            <div class="team-status-top">
+              <div class="team-disc" style="width:30px;height:30px;--td-color:var(--team-pink);"><span class="team-disc-label" style="font-size:.5rem;">VV</span></div>
+              <div class="team-status-info">
+                <span class="team-status-tag" style="font-size:.56rem;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4M8 22h8"></path></svg> Now playing</span>
+                <span class="team-name" style="--tn-color:var(--team-pink);font-size:.82rem;">The Vinyl Vixens</span>
+                <span class="team-status-counts" style="font-size:.66rem;gap:8px;">
+                  <span class="c-tokens"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z"></path></svg> 2</span>
+                  <span class="c-cards"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="12 2 22 8.5 12 15 2 8.5 12 2"></polygon><polyline points="2 14.5 12 21 22 14.5"></polyline></svg> 4</span>
+                </span>
+              </div>
+              <div style="width:40px;height:40px;border-radius:.9rem;border:2px solid rgba(255,255,255,.4);background:conic-gradient(from 135deg, color-mix(in oklch, var(--team-pink), white 35%) 0deg 180deg, color-mix(in oklch, var(--team-pink), black 25%) 180deg 360deg);box-shadow:0 3px 0 0 rgba(20,10,43,.35);position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span style="font-size:.45rem;font-weight:900;color:white;">VV</span>
+                <span style="position:absolute;top:-4px;right:-4px;width:13px;height:13px;border-radius:999px;background:var(--accent);border:2px solid rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-size:.45rem;font-weight:900;color:var(--accent-foreground);">?</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="team-status-row">
+            <div class="team-status-top">
+              <div class="team-disc" style="width:26px;height:26px;--td-color:var(--team-cyan);"><span class="team-disc-label" style="font-size:.42rem;">SQ</span></div>
+              <div class="team-status-info">
+                <span class="team-name" style="--tn-color:var(--team-cyan);font-size:.78rem;">Synth Squad</span>
+                <span class="team-status-counts" style="font-size:.64rem;gap:8px;">
+                  <span class="c-tokens"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z"></path></svg> 1</span>
+                  <span class="c-cards"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="12 2 22 8.5 12 15 2 8.5 12 2"></polygon><polyline points="2 14.5 12 21 22 14.5"></polyline></svg> 3</span>
+                </span>
+              </div>
+              <div style="width:34px;height:34px;border-radius:.85rem;border:2px solid rgba(255,255,255,.4);background:conic-gradient(from 135deg, color-mix(in oklch, var(--team-cyan), white 35%) 0deg 180deg, color-mix(in oklch, var(--team-cyan), black 25%) 180deg 360deg);box-shadow:0 3px 0 0 rgba(20,10,43,.35);position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <span style="font-size:.4rem;font-weight:900;color:white;">SQ</span>
+                <span style="position:absolute;top:-4px;right:-4px;width:13px;height:13px;border-radius:999px;background:var(--secondary);border:2px solid rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-size:.42rem;font-weight:900;color:#fff;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z"></path></svg></span>
+              </div>
+            </div>
+            <div class="team-mini-timeline" style="--mtl-color:var(--team-cyan);">
+              <div class="song-card" style="width:34px;padding:6px 3px 4px;border-radius:.6rem;box-shadow:0 2px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+                <span class="song-card-fx"><span class="bar" style="height:3px;"></span></span>
+                <span style="position:relative;font-size:.6rem;font-weight:900;">1998</span>
+              </div>
+              <div class="song-card" style="width:34px;padding:6px 3px 4px;border-radius:.6rem;box-shadow:0 2px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+                <span class="song-card-fx"><span class="bar" style="height:3px;"></span></span>
+                <span style="position:relative;font-size:.6rem;font-weight:900;">2019</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+          <span class="scan-label" style="font-size:.62rem;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M11 5 6 9H2v6h4l5 4V5Z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg> Scan for audio</span>
+          <div class="qr-panel" style="--qr-color:var(--team-pink);padding:12px;margin-top:14px;">
+            <span class="qr-panel-fx"><span class="bar" style="height:4px;"></span></span>
+            <span class="song-disc" style="width:22px;height:22px;position:absolute;top:-11px;left:50%;transform:translateX(-50%);box-shadow:0 2px 0 0 color-mix(in oklch,var(--team-pink),black 25%);"></span>
+            <div class="qr-panel-surface" style="margin-top:8px;padding:6px;">
+            <svg viewBox="0 0 100 100" width="76" height="76">
+              <rect x="6" y="6" width="22" height="22" rx="5" fill="none" stroke="#201640" stroke-width="4"/>
+              <rect x="14" y="14" width="6" height="6" rx="1.5" fill="#201640"/>
+              <rect x="72" y="6" width="22" height="22" rx="5" fill="none" stroke="#201640" stroke-width="4"/>
+              <rect x="80" y="14" width="6" height="6" rx="1.5" fill="#201640"/>
+              <rect x="6" y="72" width="22" height="22" rx="5" fill="none" stroke="#201640" stroke-width="4"/>
+              <rect x="14" y="80" width="6" height="6" rx="1.5" fill="#201640"/>
+              <g fill="#201640">
+                <rect x="36" y="10" width="5" height="5" rx="1.2"/><rect x="48" y="10" width="5" height="5" rx="1.2"/>
+                <rect x="60" y="16" width="5" height="5" rx="1.2"/><rect x="36" y="22" width="5" height="5" rx="1.2"/>
+                <rect x="54" y="28" width="5" height="5" rx="1.2"/><rect x="42" y="36" width="5" height="5" rx="1.2"/>
+                <rect x="60" y="38" width="5" height="5" rx="1.2"/><rect x="10" y="42" width="5" height="5" rx="1.2"/>
+                <rect x="20" y="48" width="5" height="5" rx="1.2"/><rect x="48" y="50" width="5" height="5" rx="1.2"/>
+                <rect x="60" y="58" width="5" height="5" rx="1.2"/><rect x="40" y="66" width="5" height="5" rx="1.2"/>
+                <rect x="54" y="72" width="5" height="5" rx="1.2"/><rect x="66" y="78" width="5" height="5" rx="1.2"/>
+              </g>
+            </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="screen-tag">Actions</div>
+          <button class="btn btn-default" style="width:100%;margin-bottom:8px;font-size:.72rem;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg> Reveal answer</button>
+          <div style="display:flex;gap:6px;">
+            <button class="action-tile" style="padding:6px 4px;font-size:.6rem;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg><span>Play</span></button>
+            <button class="action-tile" style="padding:6px 4px;font-size:.6rem;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="m18 4 3 3-3 3"></path><path d="M2 7h4.9a4 4 0 0 1 3.3 1.8l.9 1.3"></path><path d="m18 20 3-3-3-3"></path><path d="M2 17h4.9a4 4 0 0 0 3.3-1.8l4.6-6.4A4 4 0 0 1 18 7H21"></path><path d="M21 17h-3a4 4 0 0 1-3.3-1.8"></path></svg><span>New</span></button>
+            <button class="action-tile" style="padding:6px 4px;font-size:.6rem;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"></path><path d="M22 21H7"></path><path d="m5 11 9 9"></path></svg><span>Reset</span></button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div></div>
+
+  <h2 class="section-title">Game <span class="flag">after reveal</span></h2>
+  <p class="section-sub">Same screen, the moment the answer is shown. Three things swap out: the open timeline slot fills with the revealed card instead of the pending token, "Scan for audio" becomes the revealed song + round winner call-out, and "Round actions" becomes "who called it right." Teams panel loses its mystery-card / steal-token corner badges too — nothing left to place or steal this round.</p>
+  <div class="device"><div class="device-inner app-bg">
+    <div class="app-bg-icons" aria-hidden="true">
+      <svg style="width:160px;height:160px;left:-40px;top:64px;color:color-mix(in oklch, var(--primary), transparent 90%);animation:spin 18s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><path d="M12 8v-4"></path></svg>
+      <svg style="width:64px;height:64px;right:24px;top:96px;color:color-mix(in oklch, var(--secondary), transparent 80%);transform:rotate(12deg);animation:token-float 4s ease-in-out infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+      <svg style="width:80px;height:80px;left:40px;bottom:64px;color:color-mix(in oklch, var(--accent), transparent 80%);transform:rotate(-12deg);animation:token-float 5s ease-in-out infinite;animation-delay:.6s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"></path></svg>
+      <svg style="width:40px;height:40px;right:64px;bottom:112px;color:color-mix(in oklch, var(--primary), transparent 75%);animation:pop-in 2.4s ease-in-out infinite;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"></path></svg>
+      <svg style="width:32px;height:32px;left:32px;top:50%;color:color-mix(in oklch, var(--primary), transparent 85%);transform:rotate(-6deg);animation:token-float 3.6s ease-in-out infinite;animation-delay:1.2s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+    </div>
+    <div class="screen-header"><div class="left"><span class="icon-disc"><span class="disc-face"></span></span> Music Game</div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <button class="icon-ghost" aria-label="Game settings"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg></button>
+        <button class="icon-ghost danger" aria-label="End game"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></button>
+        <button class="theme-btn" aria-label="Toggle theme"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"></path></svg></button>
+      </div>
+    </div>
+    <div class="screen-body">
+      <div class="big-timeline-wrap" style="--btl-color:var(--team-pink);padding:44px 16px 12px;">
+        <div class="big-timeline-rail"></div>
+        <div class="big-timeline" style="gap:14px;">
+          <div class="song-card" style="width:104px;padding:16px 8px 10px;border-radius:1.2rem;margin-top:14px;box-shadow:0 4px 0 0 color-mix(in oklch,var(--primary),black 20%);transform:rotate(-2deg);">
+            <span class="song-card-fx"><span class="bar"></span></span>
+            <span class="song-disc" style="width:26px;height:26px;position:absolute;top:-13px;left:50%;transform:translateX(-50%);box-shadow:0 2px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+            <span style="position:relative;font-size:1.05rem;font-weight:900;margin-top:6px;">1985</span>
+            <span style="position:relative;font-size:.6rem;font-weight:800;">Tears For Fears</span>
+            <span style="position:relative;font-size:.54rem;color:var(--muted-foreground);">Everybody Wants to Rule the World</span>
+          </div>
+          <div class="song-card" style="width:104px;padding:16px 8px 10px;border-radius:1.2rem;margin-top:14px;box-shadow:0 4px 0 0 color-mix(in oklch,var(--primary),black 20%);transform:rotate(2deg);">
+            <span class="song-card-fx"><span class="bar"></span></span>
+            <span class="song-disc" style="width:26px;height:26px;position:absolute;top:-13px;left:50%;transform:translateX(-50%);box-shadow:0 2px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+            <span style="position:relative;font-size:1.05rem;font-weight:900;margin-top:6px;">2004</span>
+            <span style="position:relative;font-size:.6rem;font-weight:800;">Beyoncé</span>
+            <span style="position:relative;font-size:.54rem;color:var(--muted-foreground);">Crazy In Love</span>
+          </div>
+          <div class="song-card" style="width:104px;padding:16px 8px 10px;border-radius:1.2rem;margin-top:14px;border-color:var(--primary);box-shadow:0 4px 0 0 color-mix(in oklch,var(--primary),black 25%);">
+            <span class="song-card-fx"><span class="bar"></span></span>
+            <span class="song-disc" style="width:26px;height:26px;position:absolute;top:-13px;left:50%;transform:translateX(-50%);box-shadow:0 2px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+            <span style="position:relative;font-size:1.05rem;font-weight:900;margin-top:6px;">2015</span>
+            <span style="position:relative;font-size:.6rem;font-weight:800;">The Weeknd</span>
+            <span style="position:relative;font-size:.54rem;color:var(--muted-foreground);">Can't Feel My Face</span>
+          </div>
+        </div>
+      </div>
+      <div class="game-columns">
+
+        <div class="card" style="gap:8px;">
+          <div class="screen-tag">Teams</div>
+
+          <div class="team-status-row active">
+            <div class="team-status-top">
+              <div class="team-disc" style="width:30px;height:30px;--td-color:var(--team-pink);"><span class="team-disc-label" style="font-size:.5rem;">VV</span></div>
+              <div class="team-status-info">
+                <span class="team-status-tag" style="font-size:.56rem;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4M8 22h8"></path></svg> Now playing</span>
+                <span class="team-name" style="--tn-color:var(--team-pink);font-size:.82rem;">The Vinyl Vixens</span>
+                <span class="team-status-counts" style="font-size:.66rem;gap:8px;">
+                  <span class="c-tokens"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z"></path></svg> 2</span>
+                  <span class="c-cards"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="12 2 22 8.5 12 15 2 8.5 12 2"></polygon><polyline points="2 14.5 12 21 22 14.5"></polyline></svg> 4</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="team-status-row">
+            <div class="team-status-top">
+              <div class="team-disc" style="width:26px;height:26px;--td-color:var(--team-cyan);"><span class="team-disc-label" style="font-size:.42rem;">SQ</span></div>
+              <div class="team-status-info">
+                <span class="team-name" style="--tn-color:var(--team-cyan);font-size:.78rem;">Synth Squad</span>
+                <span class="team-status-counts" style="font-size:.64rem;gap:8px;">
+                  <span class="c-tokens"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z"></path></svg> 1</span>
+                  <span class="c-cards"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="12 2 22 8.5 12 15 2 8.5 12 2"></polygon><polyline points="2 14.5 12 21 22 14.5"></polyline></svg> 3</span>
+                </span>
+              </div>
+            </div>
+            <div class="team-mini-timeline" style="--mtl-color:var(--team-cyan);">
+              <div class="song-card" style="width:34px;padding:6px 3px 4px;border-radius:.6rem;box-shadow:0 2px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+                <span class="song-card-fx"><span class="bar" style="height:3px;"></span></span>
+                <span style="position:relative;font-size:.6rem;font-weight:900;">1998</span>
+              </div>
+              <div class="song-card" style="width:34px;padding:6px 3px 4px;border-radius:.6rem;box-shadow:0 2px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+                <span class="song-card-fx"><span class="bar" style="height:3px;"></span></span>
+                <span style="position:relative;font-size:.6rem;font-weight:900;">2019</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+          <span class="scan-label" style="color:var(--accent);"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"></path></svg> Revealed</span>
+          <div class="song-card" style="width:210px;padding:30px 20px 20px;border-radius:1.8rem;box-shadow:0 6px 0 0 color-mix(in oklch,var(--primary),black 25%);">
+            <span class="song-card-fx"><span class="bar" style="height:7px;"></span></span>
+            <span class="song-sparkle" style="top:14px;left:16px;font-size:1rem;color:var(--accent);animation:pop-in 2s ease-in-out infinite;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"></path></svg></span>
+            <span class="song-disc" style="width:50px;height:50px;margin-bottom:12px;box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+            <span style="position:relative;font-size:2.2rem;font-weight:900;letter-spacing:-.02em;">2015</span>
+            <span style="position:relative;font-size:.85rem;font-weight:800;margin-top:4px;">The Weeknd</span>
+            <span style="position:relative;font-size:.72rem;color:var(--muted-foreground);">Can't Feel My Face</span>
+          </div>
+          <div class="round-winner" style="--rw-color:var(--team-pink);width:210px;">
+            <span class="round-winner-shine"></span>
+            <span class="round-winner-badge"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"></path><path d="M7 5H4a2 2 0 0 0 0 4h1M17 5h3a2 2 0 0 1 0 4h-1"></path></svg></span>
+            <span class="round-winner-tag"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M5.8 11.3 2 22l10.7-3.79"></path><path d="M4 3h.01M22 8h.01M15 2h.01M22 20h.01"></path><path d="M17.5 8.5c.7-.7.7-2 0-2.7-.7-.7-2-.7-2.7 0M14 6c0-1 1-2 2-2M8 12l6-6"></path></svg> Round winner <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M5.8 11.3 2 22l10.7-3.79"></path><path d="M4 3h.01M22 8h.01M15 2h.01M22 20h.01"></path><path d="M17.5 8.5c.7-.7.7-2 0-2.7-.7-.7-2-.7-2.7 0M14 6c0-1 1-2 2-2M8 12l6-6"></path></svg></span>
+            <span class="round-winner-name">The Vinyl Vixens</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="screen-tag">Actions</div>
+          <div class="current-song-chip" style="margin-bottom:8px;width:100%;justify-content:space-between;padding:3px 10px 3px 3px;">
+            <span style="font-weight:800;font-size:.64rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">2015 · The Weeknd</span>
+            <button class="icon-ghost" style="width:20px;height:20px;font-size:.6rem;flex-shrink:0;" aria-label="Edit song info if incorrect"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg></button>
+          </div>
+          <p class="who-called" style="font-size:.68rem;margin:0 0 6px;">Who called it right?</p>
+          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:8px;">
+            <button class="team-pick selected" style="--tp-color:var(--team-pink);padding:6px 8px;">
+              <div class="team-disc" style="width:22px;height:22px;--td-color:var(--team-pink);"><span class="team-disc-label" style="font-size:.4rem;">VV</span></div>
+              <span class="team-name" style="--tn-color:var(--team-pink);font-size:.7rem;">The Vinyl Vixens</span>
+              <span class="team-pick-check" style="width:16px;height:16px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+            </button>
+            <button class="team-pick" style="--tp-color:var(--team-cyan);padding:6px 8px;">
+              <div class="team-disc" style="width:22px;height:22px;--td-color:var(--team-cyan);"><span class="team-disc-label" style="font-size:.4rem;">SQ</span></div>
+              <span class="team-name" style="--tn-color:var(--team-cyan);font-size:.7rem;">Synth Squad</span>
+              <span class="team-pick-check" style="width:16px;height:16px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polyline points="20 6 9 17 4 12"></polyline></svg></span>
+            </button>
+          </div>
+          <button class="btn btn-default" style="width:100%;font-size:.72rem;">Next round <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg></button>
+        </div>
+
+      </div>
+    </div>
+  </div></div>
+
+  <h2 class="section-title">End</h2>
+  <div class="device"><div class="device-inner app-bg">
+    <div class="app-bg-icons" aria-hidden="true">
+      <svg style="width:160px;height:160px;left:-40px;top:64px;color:color-mix(in oklch, var(--primary), transparent 90%);animation:spin 18s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><path d="M12 8v-4"></path></svg>
+      <svg style="width:64px;height:64px;right:24px;top:96px;color:color-mix(in oklch, var(--secondary), transparent 80%);transform:rotate(12deg);animation:token-float 4s ease-in-out infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+      <svg style="width:80px;height:80px;left:40px;bottom:64px;color:color-mix(in oklch, var(--accent), transparent 80%);transform:rotate(-12deg);animation:token-float 5s ease-in-out infinite;animation-delay:.6s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"></path></svg>
+      <svg style="width:40px;height:40px;right:64px;bottom:112px;color:color-mix(in oklch, var(--primary), transparent 75%);animation:pop-in 2.4s ease-in-out infinite;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"></path></svg>
+      <svg style="width:32px;height:32px;left:32px;top:50%;color:color-mix(in oklch, var(--primary), transparent 85%);transform:rotate(-6deg);animation:token-float 3.6s ease-in-out infinite;animation-delay:1.2s;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+    </div>
+    <div class="screen-header"><div class="left"><span class="icon-disc"><span class="disc-face"></span></span> Music Game</div><button class="theme-btn" aria-label="Toggle theme"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"></path></svg></button></div>
+    <div class="screen-body" style="display:flex;flex-direction:column;gap:16px;align-items:center;">
+      <div class="winner-card" style="width:100%;max-width:420px;padding-bottom:26px;position:relative;">
+        <div class="winner-bar"></div>
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="position:absolute;top:20px;left:20px;color:color-mix(in oklch,var(--accent),transparent 25%);animation:pop-in 2.2s ease-in-out infinite;"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"></path></svg>
+        <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="position:absolute;bottom:88px;right:22px;color:color-mix(in oklch,var(--secondary),transparent 25%);animation:pop-in 2.6s ease-in-out infinite .4s;"><path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2z"></path></svg>
+        <div style="padding:28px 24px 0;display:flex;flex-direction:column;align-items:center;gap:12px;">
+          <span style="display:flex;width:64px;height:64px;border-radius:999px;border:2px solid color-mix(in oklch,var(--primary),transparent 65%);background:color-mix(in oklch,var(--primary),transparent 90%);align-items:center;justify-content:center;box-shadow:0 4px 0 0 color-mix(in oklch,var(--primary),black 25%);animation:wiggle 2s ease-in-out infinite;">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Z"></path><path d="M7 5H4a2 2 0 0 0 0 4h1M17 5h3a2 2 0 0 1 0 4h-1"></path></svg>
+          </span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="team-disc" style="width:40px;height:40px;--td-color:var(--team-pink);"><span class="team-disc-label" style="font-size:.75rem;">VV</span></div>
+            <span class="team-name" style="--tn-color:var(--team-pink);font-size:1.4rem;">The Vinyl Vixens</span>
+          </div>
+          <span style="display:flex;align-items:center;gap:6px;font-weight:900;font-size:1rem;color:var(--primary);">
+            <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="M5.8 11.3 2 22l10.7-3.79"></path><path d="M4 3h.01M22 8h.01M15 2h.01M22 20h.01"></path><path d="M17.5 8.5c.7-.7.7-2 0-2.7-.7-.7-2-.7-2.7 0M14 6c0-1 1-2 2-2M8 12l6-6"></path></svg>
+            won!
+          </span>
+          <button class="btn btn-default btn-lg" style="margin-top:6px;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> Back to Home</button>
+        </div>
+      </div>
+      <div class="card" style="width:100%;max-width:640px;display:flex;flex-direction:column;gap:14px;">
+        <h2 style="display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:900;letter-spacing:.02em;text-transform:uppercase;color:var(--foreground);"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><line x1="10" y1="6" x2="21" y2="6"></line><line x1="10" y1="12" x2="21" y2="12"></line><line x1="10" y1="18" x2="21" y2="18"></line><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg> Final standings</h2>
+        <div class="team-status-row" style="border-color:var(--team-pink);box-shadow:0 4px 0 0 color-mix(in oklch,var(--team-pink),black 25%);">
+          <div class="team-status-top">
+            <span style="font-size:1rem;animation:wiggle 2s ease-in-out infinite;"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><circle cx="12" cy="15" r="6"></circle><path d="m9 10-4-7M15 10l4-7M12 12v6"></path></svg></span>
+            <div class="team-disc" style="width:30px;height:30px;--td-color:var(--team-pink);"><span class="team-disc-label" style="font-size:.5rem;">VV</span></div>
+            <div class="team-status-info">
+              <span class="team-name" style="--tn-color:var(--team-pink);font-size:.88rem;">The Vinyl Vixens</span>
+              <span class="team-status-counts"><span class="c-tokens"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z"></path></svg> 2</span><span class="c-cards"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="12 2 22 8.5 12 15 2 8.5 12 2"></polygon><polyline points="2 14.5 12 21 22 14.5"></polyline></svg> 10</span></span>
+            </div>
+          </div>
+          <div class="big-timeline-wrap" style="--btl-color:var(--team-pink);padding:54px 4px 4px;">
+            <div class="big-timeline-rail"></div>
+            <div class="big-timeline" style="justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;gap:16px;">
+              <div class="song-card" style="width:148px;padding:22px 12px 16px;border-radius:1.5rem;margin-top:18px;flex-shrink:0;box-shadow:0 5px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+                <span class="song-card-fx"><span class="bar"></span></span>
+                <span class="song-disc" style="width:34px;height:34px;position:absolute;top:-17px;left:50%;transform:translateX(-50%);box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+                <span style="position:relative;font-size:1.4rem;font-weight:900;margin-top:10px;">1985</span>
+                <span style="position:relative;font-size:.74rem;font-weight:800;">Tears For Fears</span>
+                <span style="position:relative;font-size:.68rem;color:var(--muted-foreground);">Everybody Wants to Rule the World</span>
+              </div>
+              <div class="song-card" style="width:148px;padding:22px 12px 16px;border-radius:1.5rem;margin-top:18px;flex-shrink:0;box-shadow:0 5px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+                <span class="song-card-fx"><span class="bar"></span></span>
+                <span class="song-disc" style="width:34px;height:34px;position:absolute;top:-17px;left:50%;transform:translateX(-50%);box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+                <span style="position:relative;font-size:1.4rem;font-weight:900;margin-top:10px;">1998</span>
+                <span style="position:relative;font-size:.74rem;font-weight:800;">Madonna</span>
+                <span style="position:relative;font-size:.68rem;color:var(--muted-foreground);">Frozen</span>
+              </div>
+              <div class="song-card" style="width:148px;padding:22px 12px 16px;border-radius:1.5rem;margin-top:18px;flex-shrink:0;box-shadow:0 5px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+                <span class="song-card-fx"><span class="bar"></span></span>
+                <span class="song-disc" style="width:34px;height:34px;position:absolute;top:-17px;left:50%;transform:translateX(-50%);box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+                <span style="position:relative;font-size:1.4rem;font-weight:900;margin-top:10px;">2015</span>
+                <span style="position:relative;font-size:.74rem;font-weight:800;">The Weeknd</span>
+                <span style="position:relative;font-size:.68rem;color:var(--muted-foreground);">Can't Feel My Face</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-status-row">
+          <div class="team-status-top">
+            <div class="team-disc" style="width:28px;height:28px;--td-color:var(--team-cyan);"><span class="team-disc-label" style="font-size:.5rem;">SQ</span></div>
+            <div class="team-status-info">
+              <span class="team-name" style="--tn-color:var(--team-cyan);font-size:.85rem;">Synth Squad</span>
+              <span class="team-status-counts"><span class="c-tokens"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-0.125em;"><path d="M13 2 3 14h7l-1 8 11-14h-8l1-6Z"></path></svg> 1</span><span class="c-cards"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polygon points="12 2 22 8.5 12 15 2 8.5 12 2"></polygon><polyline points="2 14.5 12 21 22 14.5"></polyline></svg> 7</span></span>
+            </div>
+          </div>
+          <div class="big-timeline-wrap" style="--btl-color:var(--team-cyan);padding:54px 4px 4px;">
+            <div class="big-timeline-rail"></div>
+            <div class="big-timeline" style="justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;gap:16px;">
+              <div class="song-card" style="width:148px;padding:22px 12px 16px;border-radius:1.5rem;margin-top:18px;flex-shrink:0;box-shadow:0 5px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+                <span class="song-card-fx"><span class="bar"></span></span>
+                <span class="song-disc" style="width:34px;height:34px;position:absolute;top:-17px;left:50%;transform:translateX(-50%);box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+                <span style="position:relative;font-size:1.4rem;font-weight:900;margin-top:10px;">1999</span>
+                <span style="position:relative;font-size:.74rem;font-weight:800;">TLC</span>
+                <span style="position:relative;font-size:.68rem;color:var(--muted-foreground);">No Scrubs</span>
+              </div>
+              <div class="song-card" style="width:148px;padding:22px 12px 16px;border-radius:1.5rem;margin-top:18px;flex-shrink:0;box-shadow:0 5px 0 0 color-mix(in oklch,var(--primary),black 20%);">
+                <span class="song-card-fx"><span class="bar"></span></span>
+                <span class="song-disc" style="width:34px;height:34px;position:absolute;top:-17px;left:50%;transform:translateX(-50%);box-shadow:0 3px 0 0 color-mix(in oklch,var(--primary),black 25%);"></span>
+                <span style="position:relative;font-size:1.4rem;font-weight:900;margin-top:10px;">2019</span>
+                <span style="position:relative;font-size:.74rem;font-weight:800;">Billie Eilish</span>
+                <span style="position:relative;font-size:.68rem;color:var(--muted-foreground);">Bad Guy</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+</div>
+
+<script>
+  function setTheme(dark){
+    document.body.classList.toggle('dark', dark);
+    document.getElementById('btn-light').classList.toggle('active', !dark);
+    document.getElementById('btn-dark').classList.toggle('active', dark);
+  }
+  document.getElementById('tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('.tab-btn');
+    if(!btn) return;
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+  document.querySelectorAll('.pill').forEach(p=>p.addEventListener('click',()=>p.classList.toggle('selected')));
+  var checkIconSvg = '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em;"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+  document.querySelectorAll('.checkbox').forEach(c=>c.addEventListener('click',()=>{c.classList.toggle('checked'); c.innerHTML = c.classList.contains('checked') ? checkIconSvg : '';}));
+  document.querySelectorAll('.radio-option').forEach(r=>r.addEventListener('click',()=>{
+    r.parentElement.querySelectorAll('.radio-option').forEach(sib=>sib.classList.remove('selected'));
+    r.classList.add('selected');
+  }));
+  document.querySelectorAll('.team-pick').forEach(t=>t.addEventListener('click',()=>{
+    const already = t.classList.contains('selected');
+    t.parentElement.querySelectorAll('.team-pick').forEach(sib=>sib.classList.remove('selected'));
+    if(!already) t.classList.add('selected');
+  }));
+</script>
+</body>
+</html>

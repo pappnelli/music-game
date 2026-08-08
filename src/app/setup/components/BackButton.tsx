@@ -9,11 +9,8 @@ interface BackButtonProps {
 
 export default function BackButton({ onClick }: BackButtonProps) {
   return (
-    <Button
-      variant="outline"
-      onClick={onClick}
-      className="flex items-center gap-2 h-14 px-8 border border-secondary text-secondary hover:bg-secondary hover:text-app-black hover:shadow-[0_0_15px_var(--color-secondary)] transition-all duration-300 font-mono uppercase tracking-widest"
-    >
+    <Button type="button" variant="outline" size="lg" onClick={onClick}>
+      <ArrowLeft className="size-4" />
       Back
     </Button>
   );

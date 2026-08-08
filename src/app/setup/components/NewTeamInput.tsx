@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import { useRef, useState } from "react";
 
@@ -26,39 +25,24 @@ export default function NewTeamInput({ onAddTeam }: NewTeamInputProps) {
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Add Team</label>
-      <div className="flex items-center gap-2 w-full">
-        <Input
-          ref={inputRef}
-          placeholder="ENTER_TEAM_NAME..."
-          value={teamName}
-          onChange={(e) => setTeamName(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleAdd();
-            }
-          }}
-          className={cn(
-            "h-10 px-3 bg-app-black/40 border-border focus:border-primary focus:border-2 focus:ring-app-white focus-visible:ring-2",
-            "font-mono uppercase placeholder:text-muted-foreground/50 transition-all duration-300",
-          )}
-        />
+    <div className="flex items-center gap-2">
+      <Input
+        ref={inputRef}
+        placeholder="New team name…"
+        value={teamName}
+        onChange={(e) => setTeamName(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            handleAdd();
+          }
+        }}
+        aria-label="New team name"
+      />
 
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handleAdd}
-          disabled={!teamName.trim()}
-          className={cn(
-            "h-10 w-10 border-secondary text-secondary hover:bg-secondary hover:text-app-black",
-            "hover:shadow-[0_0_15px_var(--color-secondary)] transition-all duration-300 shrink-0",
-          )}
-        >
-          <Plus size={18} />
-        </Button>
-      </div>
+      <Button type="button" size="icon" onClick={handleAdd} disabled={!teamName.trim()} aria-label="Add team">
+        <Plus size={18} />
+      </Button>
     </div>
   );
 }

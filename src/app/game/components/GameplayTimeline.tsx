@@ -1,6 +1,6 @@
-import { Song, Team, TokenPlacement, removeCard, removeToken, setShowSolution } from "@/lib/store/gameSlice";
+import { Song, Team, TokenPlacement } from "@/lib/store/gameSlice";
 import { Active, useDroppable } from "@dnd-kit/core";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import TimelineItem from "./gameplaytimeline/TimelineItem";
 import TimelineSlot from "./gameplaytimeline/TimelineSlot";
 
@@ -32,8 +32,21 @@ export default function GameplayTimeline({ teamId, active }: GameplayTimelinePro
     data: { type: "slot", index: 0 },
   });
 
+  const railColor = targetTeam?.color ?? "var(--border)";
+
   return (
-    <div className="flex flex-row justify-center w-full flex-nowrap overflow-visible">
+    <div className="relative flex h-full w-full min-w-max items-stretch px-4">
+      {/* The rail tints to the current team's color, same as the big-timeline treatment on the
+          Teams status panel and Final standings -- it's their timeline, so it reads as theirs. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-4 top-1/2 h-1 -translate-y-1/2 rounded-full"
+        style={{
+          background: `color-mix(in oklch, ${railColor}, transparent 25%)`,
+          boxShadow: `0 2px 0 0 color-mix(in oklch, ${railColor}, black 30%)`,
+        }}
+      />
+
       <TimelineSlot index={0} isOver={isFirstOver} active={active} ref={setFirstSlotRef} />
 
       {sortedCards.map((song: Song, i: number) => {

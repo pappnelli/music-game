@@ -14,17 +14,17 @@ export default function ThemeToggle() {
   }, []);
 
   if (!mounted) {
-    // Renderelhetünk egy üres gombot/placeholder-t is a layout eltolódás elkerülésére
-    return <div className="w-9 h-9" />;
+    // Reserve the icon button's footprint to avoid layout shift while the theme resolves
+    return <div className="size-10 shrink-0" />;
   }
 
   return (
     <button
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="p-2 rounded-md border border-border bg-app-black/40 hover:bg-secondary/20 transition-all duration-300 cursor-pointer"
-      aria-label="Toggle Theme"
+      aria-label="Toggle theme"
+      className="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-primary/30 bg-card text-foreground shadow-sm transition-all hover:border-primary hover:bg-primary/10 active:scale-90"
     >
-      {theme === "dark" ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-indigo-400" />}
+      {theme === "dark" ? <Sun className="size-5 text-accent" /> : <Moon className="size-5 text-secondary" />}
     </button>
   );
 }

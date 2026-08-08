@@ -17,7 +17,9 @@ export default function TimelineItem({ song, index, active }: TimelineItemProps)
 
   return (
     <>
-      <SongCard song={song} size="medium" />
+      <div className="flex shrink-0 items-center">
+        <SongCard song={song} size="medium" />
+      </div>
 
       <TimelineSlot index={index} isOver={isOver} active={active} ref={setNodeRef} />
     </>

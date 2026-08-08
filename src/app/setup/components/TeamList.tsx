@@ -1,11 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { TeamDisc } from "@/components/Disc";
 import { Team } from "@/lib/store/setupSlice";
 import { closestCenter, DndContext, DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Pencil, Trash } from "lucide-react";
+import { GripVertical, Pencil, Trash2, Users } from "lucide-react";
+import { TEAM_NAME_CLASS, teamNameGlowStyle } from "@/lib/teamColors";
 import { cn } from "@/lib/utils";
 import EditTeamDialog from "./EditTeamDialog";
 import { useState } from "react";
@@ -42,8 +44,9 @@ export default function TeamList({ teams, onRemoveTeam, reorderTeams }: TeamList
 
   if (teams.length === 0) {
     return (
-      <div className="p-4 rounded-xl border border-dashed border-border bg-app-black/20">
-        <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest">No teams added yet...</p>
+      <div className="flex h-full min-h-32 flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border text-center">
+        <Users className="size-8 text-muted-foreground/50" />
+        <p className="text-sm font-semibold text-muted-foreground">No teams yet — add at least two to start.</p>
       </div>
     );
   }
@@ -53,8 +56,8 @@ export default function TeamList({ teams, onRemoveTeam, reorderTeams }: TeamList
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={teams} strategy={verticalListSortingStrategy}>
           <div className="flex flex-col gap-2">
-            {teams.map((team) => (
-              <SortableTeamItem key={team.id} team={team} onEditTeam={() => setEditingId(team.id)} onRemoveTeam={onRemoveTeam} />
+            {teams.map((team, index) => (
+              <SortableTeamItem key={team.id} team={team} index={index} onEditTeam={() => setEditingId(team.id)} onRemoveTeam={onRemoveTeam} />
             ))}
           </div>
         </SortableContext>
@@ -67,18 +70,18 @@ export default function TeamList({ teams, onRemoveTeam, reorderTeams }: TeamList
 
 interface SortableTeamItemProps {
   team: Team;
+  index: number;
   onEditTeam: () => void;
   onRemoveTeam: (id: string) => void;
 }
 
-function SortableTeamItem({ team, onEditTeam, onRemoveTeam }: SortableTeamItemProps) {
+function SortableTeamItem({ team, index, onEditTeam, onRemoveTeam }: SortableTeamItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: team.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     zIndex: isDragging ? 50 : 1,
-    // borderColor: `${team.color}40`,
   };
 
   return (
@@ -86,40 +89,37 @@ function SortableTeamItem({ team, onEditTeam, onRemoveTeam }: SortableTeamItemPr
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex items-center justify-between px-4 py-2 rounded-lg border",
-        !isDragging && "transition-all duration-300 backdrop-blur-sm hover:border-secondary",
-        isDragging
-          ? "bg-primary/20 border-primary shadow-[0_0_20px_var(--color-primary)] scale-[1.02] cursor-grabbing"
-          : "bg-app-black/40 border-border",
+        "flex items-center gap-2 rounded-xl border-2 border-border bg-muted/40 py-1.5 pr-1.5 pl-2.5 transition-shadow",
+        isDragging ? "cursor-grabbing border-primary shadow-[0_4px_0_0_color-mix(in_oklch,var(--primary),black_25%)]" : "backdrop-blur-sm"
       )}
     >
-      <div
-        className="px-2 py-0.5 rounded text-xs uppercase font-mono border"
-        style={{
-          borderColor: team.color,
-          color: team.color,
-          backgroundColor: `${team.color}10`,
-        }}
-      >
+      <span className="w-5 shrink-0 text-center text-xs font-black text-muted-foreground">{index + 1}</span>
+
+      <TeamDisc team={team} size={40} />
+
+      <span className={cn("flex-1 truncate text-sm", TEAM_NAME_CLASS)} style={teamNameGlowStyle(team.color)}>
         {team.name}
-      </div>
+      </span>
 
-      <div className="flex items-center gap-1">
-        <Button variant="ghost" size="icon" onClick={onEditTeam} className="text-muted-foreground hover:text-secondary">
-          <Pencil size={16} />
-        </Button>
-
-        <Button variant="ghost" size="icon" onClick={() => onRemoveTeam(team.id)} className="text-muted-foreground hover:text-primary">
-          <Trash size={16} />
-        </Button>
-
-        <div
-          {...attributes}
-          {...listeners}
-          className="cursor-grab active:cursor-grabbing p-2 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <GripVertical size={16} />
-        </div>
+      <Button type="button" variant="ghost" size="icon-sm" onClick={onEditTeam} aria-label={`Edit ${team.name}`}>
+        <Pencil size={15} />
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon-sm"
+        onClick={() => onRemoveTeam(team.id)}
+        aria-label={`Remove ${team.name}`}
+        className="hover:bg-destructive/10 hover:text-destructive"
+      >
+        <Trash2 size={15} />
+      </Button>
+      <div
+        {...attributes}
+        {...listeners}
+        className="flex cursor-grab items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:text-foreground active:cursor-grabbing"
+      >
+        <GripVertical size={16} />
       </div>
     </div>
   );

@@ -1,9 +1,17 @@
+"use client";
+
+import { TeamDisc } from "@/components/Disc";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { useSpotify } from "@/components/SpotifyPlayerProvider";
 import { RootState } from "@/lib/store";
-import { removeCard, removeToken, setShowSolution, Song, Team, TokenPlacement } from "@/lib/store/gameSlice";
 import { cn } from "@/lib/utils";
-import { Play, RotateCw, Shuffle, XCircle } from "lucide-react";
+import { drawNewCard, nextRound, removeCard, removeToken, setShowSolution, Song, Team, TokenPlacement } from "@/lib/store/gameSlice";
+import { TEAM_NAME_CLASS, teamNameGlowStyle } from "@/lib/teamColors";
+import { Check, Eraser, Eye, LucideIcon, Play, Radio, Shuffle, SkipForward, Trophy } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Token from "../Token";
 
 interface ActionsPanelProps {
   showSolution: boolean;
@@ -12,43 +20,84 @@ interface ActionsPanelProps {
   teams: Team[];
   usedTokens: TokenPlacement[];
   currentTeamId: string | null;
-  selectedTeamId: string | null;
-  setSelectedTeamId: (id: string | null) => void;
-  onPlay: () => void;
-  onDrawNew: () => void;
-  onReveal: () => void;
-  onNextRound: () => void;
-  onAbort: () => void;
 }
 
-export default function ActionsPanel({
-  showSolution,
-  currentSong,
-  cardPosition,
-  teams,
-  usedTokens,
-  currentTeamId,
-  selectedTeamId,
-  setSelectedTeamId,
-  onPlay,
-  onDrawNew,
-  onReveal,
-  onNextRound,
-  onAbort,
-}: ActionsPanelProps) {
+interface ActionTileProps {
+  icon: LucideIcon;
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+}
+
+function ActionTile({ icon: Icon, label, onClick, disabled }: ActionTileProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="flex flex-1 flex-col items-center justify-center gap-1 rounded-xl border-2 border-border bg-card py-2 text-xs font-black tracking-wide text-muted-foreground uppercase shadow-[0_3px_0_0_var(--border)] transition-all hover:border-primary/50 hover:text-primary active:translate-y-[3px] active:shadow-none disabled:pointer-events-none disabled:opacity-40 disabled:shadow-none"
+    >
+      <Icon className="size-4" />
+      {label}
+    </button>
+  );
+}
+
+export default function ActionsPanel({ showSolution, currentSong, cardPosition, teams, usedTokens, currentTeamId }: ActionsPanelProps) {
+  const { data: session } = useSession();
+  const { deviceId } = useSpotify();
+
   const dispatch = useDispatch();
 
   const musicMode = useSelector((state: RootState) => state.game.musicMode);
 
-  if (!currentSong)
-    return (
-      <button
-        onClick={onAbort}
-        className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl flex items-center justify-center gap-2 border border-red-500/20 transition-colors text-sm font-semibold"
-      >
-        <XCircle size={16} /> Játék megszakítása
-      </button>
-    );
+  const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
+
+  const spotifyId = currentSong?.spotifyId?.split("/").pop()?.split("?")[0];
+  const accessToken = session?.accessToken;
+
+  const handlePlayMusic = useCallback(async () => {
+    if (!accessToken || !deviceId || !spotifyId) {
+      console.log("Hiányzó feltételek: Token, DeviceID vagy SpotifyID!");
+      return;
+    }
+
+    try {
+      await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          uris: [`spotify:track:${spotifyId}`],
+        }),
+      });
+    } catch (error) {
+      console.error("Hiba a zenelejátszás indításakor:", error);
+    }
+  }, [accessToken, deviceId, spotifyId]);
+
+  useEffect(() => {
+    if (spotifyId && musicMode === "spotify") {
+      handlePlayMusic();
+    }
+  }, [handlePlayMusic, spotifyId, musicMode]);
+
+  const handleDrawNewCard = () => {
+    dispatch(drawNewCard());
+  };
+
+  const handleReveal = () => {
+    dispatch(setShowSolution(true));
+  };
+
+  const handleNextRound = () => {
+    dispatch(nextRound({ tokenWinnerId: selectedTeamId }));
+    setSelectedTeamId(null);
+  };
+
+  if (!currentSong) return null;
 
   function handleReset() {
     usedTokens.map((token) => dispatch(removeToken({ teamId: token.teamId })));
@@ -60,103 +109,81 @@ export default function ActionsPanel({
   const rotatedTeams = currentIdx >= 0 ? [...teams.slice(currentIdx), ...teams.slice(0, currentIdx)] : teams;
 
   return (
-    <div className="flex flex-col flex-1 h-full gap-4">
+    <Card className="flex h-full min-h-0 flex-col gap-3 p-3">
+      <h2 className="flex shrink-0 items-center gap-2 px-1 text-xs font-black tracking-wide text-foreground uppercase">
+        {showSolution ? <Trophy className="size-4 text-secondary" /> : <Radio className="size-4 text-primary" />}
+        {showSolution ? "Bonus Token" : "Round Actions"}
+      </h2>
+
       {!showSolution ? (
-        /* --- MEGOLDÁS ELŐTTI FÁZIS --- */
-        <div className="flex flex-col gap-3 flex-1 justify-center">
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              disabled={musicMode !== "spotify"}
-              onClick={onPlay}
-              className={cn(
-                "py-3 flex items-center justify-center transition-all rounded-sm ",
-                musicMode !== "spotify"
-                  ? "bg-transparent border border-muted text-muted-foreground cursor-not-allowed opacity-50"
-                  : "bg-secondary/5 hover:bg-secondary/90 border border-secondary/40 text-secondary hover:text-app-black hover:shadow-[0_0_10px_var(--color-secondary)]",
-              )}
-            >
-              <Play size={14} />
-            </button>
-            <button
-              onClick={onDrawNew}
-              className="py-3 flex items-center justify-center bg-secondary/5 border border-secondary/40 text-secondary hover:bg-secondary/90 hover:text-app-black transition-all rounded-sm hover:shadow-[0_0_10px_var(--color-secondary)]"
-            >
-              <Shuffle size={14} />
-            </button>
-            <button
-              disabled={usedTokens?.length === 0}
-              onClick={handleReset}
-              className={cn(
-                "py-3 flex items-center justify-center transition-all rounded-sm ",
-                usedTokens?.length === 0
-                  ? "bg-transparent border border-muted text-muted-foreground cursor-not-allowed opacity-50"
-                  : "bg-secondary/5 hover:bg-secondary/90 border border-secondary/40 text-secondary hover:text-app-black hover:shadow-[0_0_10px_var(--color-secondary)]",
-              )}
-            >
-              <RotateCw size={14} />
-            </button>
+        <div className="flex min-h-0 flex-1 flex-col justify-center gap-3 overflow-x-hidden overflow-y-auto">
+          <div className="relative shrink-0">
+            {cardPosition !== null && (
+              <span aria-hidden className="absolute inset-0 rounded-full bg-primary/50 [animation:ping_2s_cubic-bezier(0,0,0.2,1)_infinite]" />
+            )}
+            <Button type="button" size="lg" disabled={cardPosition === null} onClick={handleReveal} className="relative w-full">
+              <Eye className="size-5" />
+              Reveal Answer
+            </Button>
           </div>
 
-          {/* A REVEAL a főszereplő */}
-          <button
-            disabled={cardPosition === null}
-            onClick={onReveal}
-            className={cn(
-              "w-full py-4 font-black uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all rounded-sm",
-              cardPosition === null
-                ? "bg-transparent border border-muted text-muted-foreground cursor-not-allowed opacity-50"
-                : "bg-emerald-500/10 hover:bg-emerald-500 border border-emerald-500 text-emerald-500 hover:text-app-black hover:shadow-[0_0_15px_rgba(16,185,129,1)]",
-            )}
-          >
-            Reveal Solution
-          </button>
+          <div className="flex shrink-0 items-stretch gap-2">
+            <ActionTile icon={Play} label="Play" onClick={handlePlayMusic} disabled={musicMode !== "spotify"} />
+            <ActionTile icon={Shuffle} label="Swap" onClick={handleDrawNewCard} />
+            <ActionTile icon={Eraser} label="Reset" onClick={handleReset} disabled={usedTokens?.length === 0} />
+          </div>
         </div>
       ) : (
-        /* --- MEGOLDÁS UTÁNI FÁZIS --- */
-        <div className="flex flex-col gap-4 flex-1">
-          <div className="flex flex-col gap-1 items-center justify-center">
-            <span className="relative bg-card text-xs font-mono text-app-white/60 uppercase tracking-[0.3em] font-bold">
-              {"// ALLOCATE_TACTICAL_CREDIT"}
-            </span>
+        <div className="flex min-h-0 flex-1 flex-col gap-2.5">
+          <span className="shrink-0 px-1 text-xs font-semibold text-muted-foreground">Who called it right?</span>
 
-            <div className="flex flex-wrap items-center justify-center gap-3 max-h-[160px] overflow-y-auto custom-scrollbar p-2">
-              {rotatedTeams.map((team) => (
+          <div className="flex min-w-0 flex-1 flex-col gap-1.5 overflow-x-hidden overflow-y-auto pr-0.5">
+            {rotatedTeams.map((team) => {
+              const isSelected = selectedTeamId === team.id;
+              return (
                 <button
                   key={team.id}
-                  onClick={() => setSelectedTeamId(selectedTeamId === team.id ? null : team.id)}
-                  className="group transition-all duration-300 hover:scale-120 active:scale-95"
+                  type="button"
+                  onClick={() => setSelectedTeamId(isSelected ? null : team.id)}
+                  aria-pressed={isSelected}
+                  style={
+                    isSelected
+                      ? {
+                          borderColor: team.color,
+                          backgroundColor: `color-mix(in oklch, ${team.color}, transparent 88%)`,
+                          boxShadow: `0 3px 0 0 color-mix(in oklch, ${team.color}, black 25%)`,
+                        }
+                      : undefined
+                  }
+                  className={cn(
+                    "relative flex w-full min-w-0 shrink-0 items-center gap-2 rounded-xl border-2 px-2.5 py-2 text-left text-xs font-bold transition-all",
+                    !isSelected && "border-border bg-muted/30 opacity-70 hover:opacity-100"
+                  )}
                 >
-                  <div
-                    className={cn(
-                      "transition-all duration-300",
-                      selectedTeamId === team.id ? "opacity-100 scale-100" : "opacity-40 hover:opacity-60",
-                    )}
-                  >
-                    <Token team={team} />
-                  </div>
+                  <TeamDisc team={team} size={22} className="shrink-0" />
+                  <span className={cn("min-w-0 flex-1 truncate", TEAM_NAME_CLASS)} style={teamNameGlowStyle(team.color)}>
+                    {team.name}
+                  </span>
+                  {isSelected && (
+                    <span
+                      aria-hidden
+                      className="flex size-4 shrink-0 items-center justify-center rounded-full text-white shadow"
+                      style={{ backgroundColor: team.color }}
+                    >
+                      <Check className="size-2.5" strokeWidth={3} />
+                    </span>
+                  )}
                 </button>
-              ))}
-            </div>
+              );
+            })}
           </div>
 
-          <button
-            onClick={onNextRound}
-            className="w-full py-4 bg-primary/10 border border-primary text-primary font-black uppercase tracking-widest hover:bg-primary hover:text-app-black shadow-[0_0_15px_rgba(245,158,11,0.2)] transition-all rounded-sm hover:shadow-[0_0_15px_var(--color-primary)]"
-          >
+          <Button type="button" size="lg" onClick={handleNextRound} className="w-full shrink-0">
             Next Round
-          </button>
+            <SkipForward className="size-5" />
+          </Button>
         </div>
       )}
-
-      {/* FOOTER */}
-      <div className="text-center pt-2 border-t border-app-white/5">
-        <button
-          onClick={onAbort}
-          className="text-xs font-mono text-red-500/70 hover:text-red-500 uppercase tracking-widest transition-colors duration-200 hover:[text-shadow:0_0_10px_#ffb1b5]"
-        >
-          {"[ Terminate Session ]"}
-        </button>
-      </div>
-    </div>
+    </Card>
   );
 }

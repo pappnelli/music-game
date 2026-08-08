@@ -1,8 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Check, Music } from "lucide-react";
+import { CheckCircle2, Music } from "lucide-react";
 
 interface SpotifyConnectButtonProps {
   isLoggedIn: boolean;
@@ -12,31 +11,17 @@ interface SpotifyConnectButtonProps {
 export default function SpotifyConnectButton({ isLoggedIn, onConnect }: SpotifyConnectButtonProps) {
   if (!isLoggedIn) {
     return (
-      <Button
-        onClick={onConnect}
-        className={cn(
-          "w-full flex items-center gap-2 font-mono uppercase tracking-widest",
-          "bg-primary/20 border border-primary text-primary text-sm hover:bg-primary hover:text-app-black",
-          "hover:shadow-[0_0_15px_var(--color-primary)] transition-all duration-300",
-        )}
-      >
-        <Music size={16} />
+      <Button type="button" variant="secondary" onClick={onConnect} className="w-full sm:w-auto">
+        <Music className="size-4" />
         Connect Spotify
       </Button>
     );
   }
 
   return (
-    <Button
-      // className="flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-accent/10 border border-accent/20 text-accent animate-in fade-in duration-500"
-      className={cn(
-        "w-full flex items-center gap-2 font-mono uppercase tracking-widest",
-        "bg-app-white/20 border border-app-white text-app-white text-sm transition-all duration-300",
-      )}
-      disabled
-    >
-      <Check size={18} />
+    <div className="flex w-fit items-center gap-1.5 rounded-full border-2 border-accent/40 bg-accent/10 px-3 py-1.5 text-xs font-bold text-accent">
+      <CheckCircle2 className="size-4" />
       Spotify connected
-    </Button>
+    </div>
   );
 }

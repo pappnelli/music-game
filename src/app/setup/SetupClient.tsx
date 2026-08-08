@@ -1,11 +1,14 @@
 "use client";
 
+import AppBackground from "@/components/AppBackground";
+import Disc from "@/components/Disc";
+import ThemeToggle from "@/components/ThemeToggle";
+import { Card } from "@/components/ui/card";
 import { loadSongs } from "@/lib/songLoader";
 import { Team as GameTeam, selectFilteredSongs, Song, startGame, storeGlobalCatalog } from "@/lib/store/gameSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import {
   addTeam,
-  editTeam,
   initFiltersFromCatalog,
   removeTeam,
   reorderTeams,
@@ -21,10 +24,12 @@ import {
   Team,
 } from "@/lib/store/setupSlice";
 import { getUniqueTeamColor } from "@/lib/teamColors";
+import { Disc3, ListMusic, Sliders, Users } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import BackButton from "./components/BackButton";
+import FinalRoundRuleSelector from "./components/FinalRoundRuleSelector";
 import GenreSelector from "./components/GenreSelector";
 import MusicModeSelector from "./components/MusicModeSelector";
 import NewTeamInput from "./components/NewTeamInput";
@@ -34,8 +39,6 @@ import StartTokenSelector from "./components/StartTokenSelector";
 import TeamList from "./components/TeamList";
 import WinnerCardsSelector from "./components/WinnerCardsSelector";
 import YearRangeSelector from "./components/YearRangeSelector";
-import FinalRoundRuleSelector from "./components/FinalRoundRuleSelector";
-import ThemeToggle from "@/components/ThemeToggle";
 
 export default function SetupClient() {
   const router = useRouter();
@@ -50,14 +53,16 @@ export default function SetupClient() {
 
   const filteredSongs = useAppSelector(selectFilteredSongs);
 
-  const isStartDisabled =
-    teams.length < 2 ||
-    filteredSongs.length < teams.length * 2 ||
-    genre.length === 0 ||
-    !yearStart ||
-    !yearEnd ||
-    !winCondition ||
-    (musicMode === "spotify" && !isSpotifyLoggedIn);
+  const missingRequirements = [
+    teams.length < 2 && "Add at least 2 teams",
+    genre.length === 0 && "Select at least one genre",
+    (!yearStart || !yearEnd) && "Set a valid year range",
+    filteredSongs.length < teams.length * 2 && "Not enough songs match your filters",
+    !winCondition && "Set how many cards win the game",
+    musicMode === "spotify" && !isSpotifyLoggedIn && "Connect Spotify to continue",
+  ].filter(Boolean) as string[];
+
+  const isStartDisabled = missingRequirements.length > 0;
 
   function formatCatalogWithIds(rawSongs: Song[]) {
     const yearCounters: Record<number, number> = {};
@@ -93,7 +98,7 @@ export default function SetupClient() {
   }, [dispatch]);
 
   function handleBack() {
-    router.push("/"); // vagy ahova vissza akarsz menni
+    router.push("/");
   }
 
   function handleStart() {
@@ -137,80 +142,94 @@ export default function SetupClient() {
 
   if (isParsingExcel) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-6 bg-app-black">
-        <div className="relative w-16 h-16 animate-spin">
-          <div className="absolute inset-0 border-4 border-primary/20 rounded-full" />
-
-          <div
-            className="absolute inset-0 border-4 border-transparent rounded-full"
-            style={{
-              background: "linear-gradient(to right, var(--primary), var(--secondary)) border-box",
-              mask: "linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0)",
-              maskComposite: "exclude",
-              backgroundOrigin: "border-box",
-            }}
-          />
-        </div>
-        <p className="font-mono text-primary uppercase tracking-[0.3em] animate-pulse">Initializing Database...</p>
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-4 px-6 text-center">
+        <Disc3 className="size-14 animate-[spin_1.4s_linear_infinite] text-primary" />
+        <p className="text-sm font-bold tracking-wide text-muted-foreground uppercase">Loading the song catalog…</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen max-w-7xl mx-auto flex flex-col gap-4 p-8">
-      <div className="absolute top-4 right-4 z-11">
+    <div className="relative flex min-h-dvh flex-col lg:h-dvh lg:overflow-hidden">
+      <AppBackground />
+
+      <header className="flex items-center justify-between gap-3 border-b-2 border-border px-4 py-3 sm:px-6">
+        <div className="flex items-center gap-2">
+          <Disc size={22} spin shadow="0 1px 0 0 color-mix(in oklch, var(--primary), black 30%)" />
+          <h1 className="text-lg font-black tracking-tight text-foreground sm:text-xl">Game Setup</h1>
+        </div>
         <ThemeToggle />
-      </div>
+      </header>
 
-      <h2 className="text-5xl font-black text-center font-800 uppercase tracking-[0.2em] text-transparent bg-clip-text bg-gradient-to-b from-app-white to-gray-500 drop-shadow-[var(--shadow-glow)]">
-        System Setup
-      </h2>
+      <main className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 lg:overflow-hidden">
+        <div className="mx-auto flex h-full max-w-[1600px] flex-col items-stretch gap-5 lg:flex-row lg:justify-center">
+          <Card className="gap-4 p-4 sm:p-5 lg:w-80 lg:shrink-0 lg:overflow-y-auto xl:w-96 [animation:pop-in_0.4s_cubic-bezier(0.34,1.56,0.64,1)_backwards]">
+            <h2 className="flex items-center gap-2 text-sm font-black tracking-wide text-foreground uppercase">
+              <ListMusic className="size-4 text-primary" />
+              Music
+            </h2>
 
-      <div className="w-full grid grid-cols-9 gap-4">
-        <div className="col-span-3 flex flex-col gap-4 p-4 rounded-2xl bg-card border border-app-white/5 backdrop-blur-xl  shadow-[var(--shadow-glow)]">
-          <h3 className="text-sm font-mono text-secondary uppercase tracking-[0.2em]">{"// Music configuration"}</h3>
+            <GenreSelector genres={genres} selected={genre} onChange={(list) => dispatch(setGenre(list))} />
 
-          <GenreSelector genres={genres} selected={genre} onChange={(list) => dispatch(setGenre(list))} />
+            <YearRangeSelector
+              yearStart={yearStart}
+              yearEnd={yearEnd}
+              onStartChange={(v) => dispatch(setYearStart(v))}
+              onEndChange={(v) => dispatch(setYearEnd(v))}
+            />
 
-          <YearRangeSelector
-            yearStart={yearStart}
-            yearEnd={yearEnd}
-            onStartChange={(v) => dispatch(setYearStart(v))}
-            onEndChange={(v) => dispatch(setYearEnd(v))}
-          />
+            <SongsPerYearSelector value={songsPerYear} onChange={(v) => dispatch(setSongsPerYear(v))} />
 
-          <SongsPerYearSelector value={songsPerYear} onChange={(v) => dispatch(setSongsPerYear(v))} />
+            <MusicModeSelector
+              value={musicMode}
+              onChange={(mode) => dispatch(setMusicMode(mode))}
+              isSpotifyLoggedIn={isSpotifyLoggedIn}
+              signIn={signIn}
+            />
+
+            <p className="text-xs font-semibold text-muted-foreground">{filteredSongs.length} songs match your filters.</p>
+          </Card>
+
+          <Card
+            className="gap-4 p-4 sm:p-5 lg:w-72 lg:shrink-0 lg:overflow-y-auto xl:w-80 [animation:pop-in_0.4s_cubic-bezier(0.34,1.56,0.64,1)_backwards] [animation-delay:100ms]"
+          >
+            <h2 className="flex items-center gap-2 text-sm font-black tracking-wide text-foreground uppercase">
+              <Sliders className="size-4 text-secondary" />
+              Rules
+            </h2>
+
+            <StartTokenSelector value={startingTokens} onChange={(v) => dispatch(setStartingTokens(v))} />
+            <WinnerCardsSelector value={winCondition} onChange={(v) => dispatch(setWinCondition(v))} />
+            <FinalRoundRuleSelector value={finalRoundRule} onChange={(v) => dispatch(setFinalRoundRule(v))} />
+          </Card>
+
+          <Card
+            className="flex min-h-0 flex-1 flex-col gap-4 p-4 sm:p-5 lg:max-w-md lg:overflow-hidden [animation:pop-in_0.4s_cubic-bezier(0.34,1.56,0.64,1)_backwards] [animation-delay:200ms]"
+          >
+            <h2 className="flex items-center gap-2 text-sm font-black tracking-wide text-foreground uppercase">
+              <Users className="size-4 text-accent" />
+              Teams
+            </h2>
+
+            <NewTeamInput onAddTeam={(name) => dispatch(addTeam({ id: crypto.randomUUID(), name, color: getUniqueTeamColor(teams) }))} />
+
+            <div className="min-h-0 flex-1 lg:overflow-y-auto">
+              <TeamList teams={teams} onRemoveTeam={handleRemoveTeam} reorderTeams={handleReorderTeams} />
+            </div>
+          </Card>
         </div>
+      </main>
 
-        <div className="col-span-3 flex flex-col gap-4 p-4 rounded-2xl bg-card border border-app-white/5 backdrop-blur-xl shadow-[var(--shadow-glow)]">
-          <h3 className="text-sm font-mono text-secondary uppercase tracking-[0.2em]">{"// Gameplay Rules"}</h3>
+      <footer className="sticky bottom-0 flex items-center justify-between gap-3 border-t-2 border-border bg-background/90 px-4 py-3 backdrop-blur-xl sm:px-6">
+        {isStartDisabled && (
+          <p className="absolute bottom-full left-0 mb-2 w-full px-4 text-right text-xs font-semibold text-secondary sm:px-6">
+            {missingRequirements[0]}
+          </p>
+        )}
 
-          <StartTokenSelector value={startingTokens} onChange={(v) => dispatch(setStartingTokens(v))} />
-
-          <WinnerCardsSelector value={winCondition} onChange={(v) => dispatch(setWinCondition(v))} />
-
-          <FinalRoundRuleSelector value={finalRoundRule} onChange={(v) => dispatch(setFinalRoundRule(v))} />
-
-          <MusicModeSelector
-            value={musicMode}
-            onChange={(mode) => dispatch(setMusicMode(mode))}
-            isSpotifyLoggedIn={isSpotifyLoggedIn}
-            signIn={signIn}
-          />
-        </div>
-
-        <div className="col-span-3 flex flex-col gap-4 p-4 rounded-2xl bg-card border border-app-white/5 backdrop-blur-xl shadow-[var(--shadow-glow)]">
-          <h3 className="text-sm font-mono text-secondary uppercase tracking-[0.2em]">{"// Active Teams"}</h3>
-          <NewTeamInput onAddTeam={(name) => dispatch(addTeam({ id: crypto.randomUUID(), name, color: getUniqueTeamColor(teams) }))} />
-          <TeamList teams={teams} onRemoveTeam={handleRemoveTeam} reorderTeams={handleReorderTeams} />
-        </div>
-      </div>
-
-      {/* TODO */}
-      <div className="flex items-center justify-center gap-6">
         <BackButton onClick={handleBack} />
         <StartGameButton disabled={isStartDisabled} onClick={handleStart} />
-      </div>
+      </footer>
     </div>
   );
 }

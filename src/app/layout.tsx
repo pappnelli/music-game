@@ -6,17 +6,16 @@ import { ToastProvider } from "@/components/ui/toast";
 import { Toaster } from "@/components/ui/toaster";
 import { ReactNode } from "react";
 import "../styles/globals.css";
-import ThemeToggle from "@/components/ThemeToggle";
 
 export const metadata = {
   title: "Music Game",
-  description: "A legjobb zenefelismerő játék a barátaidnak.",
+  description: "The ultimate music-guessing party game for you and your friends.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="hu" suppressHydrationWarning>
-      <body className="min-h-screen bg-background text-foreground">
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-dvh bg-background font-sans text-foreground antialiased">
         <ThemeProvider>
           <ReduxProvider>
             <ToastProvider>

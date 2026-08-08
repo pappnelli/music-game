@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { TeamDisc } from "@/components/Disc";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useAppDispatch } from "@/lib/store/hooks";
 import { editTeam, Team } from "@/lib/store/setupSlice";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Save, X } from "lucide-react";
 import { TEAM_COLORS } from "@/lib/teamColors";
 import { cn } from "@/lib/utils";
-import Token from "@/app/game/components/Token";
+import { Pencil } from "lucide-react";
+import { useState } from "react";
 
 interface EditTeamDialogProps {
   team: Team | null;
@@ -42,18 +44,21 @@ export default function EditTeamDialog({ team, allTeams, onClose }: EditTeamDial
 
   return (
     <Dialog open={!!team} onOpenChange={onClose}>
-      <DialogContent className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-md bg-app-black border border-border backdrop-blur-xl shadow-[0_0_30px_rgba(0,0,0,0.8)] p-6 rounded-2xl z-50 text-foreground font-mono [&>button]:hidden overflow-hidden">
-        <DialogHeader className="pb-4 border-b border-border/40">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-base font-bold font-mono uppercase tracking-wider text-app-white">_EDIT_TEAM</DialogTitle>
-            <span className="text-[10px] text-muted-foreground font-mono uppercase tracking-widest">ID: {team.id.slice(0, 6)}</span>
-          </div>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2.5">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-secondary bg-secondary/10 shadow-[0_3px_0_0_color-mix(in_oklch,var(--secondary),black_25%)]">
+              <Pencil className="size-4 text-secondary" />
+            </span>
+            Edit team
+          </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-5 py-3">
-          <div className="flex flex-col gap-2">
-            <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Team Name</label>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="team-name">Team name</Label>
             <Input
+              id="team-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               onKeyDown={(e) => {
@@ -62,18 +67,14 @@ export default function EditTeamDialog({ team, allTeams, onClose }: EditTeamDial
                   handleSave();
                 }
               }}
-              placeholder="ENTER_TEAM_NAME..."
-              className={cn(
-                "h-10 px-3 bg-app-black/40 border-border focus:border-primary focus:border-2 focus:ring-app-white focus-visible:ring-2",
-                "font-mono uppercase placeholder:text-muted-foreground/50 transition-all duration-300",
-              )}
+              placeholder="Enter team name…"
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-mono text-muted-foreground uppercase tracking-wider block">Team Color</label>
+          <div className="flex flex-col gap-1.5">
+            <Label>Team color</Label>
 
-            <div className="m-fill flex flex-wrap gap-2 pt-1 px-1 items-center justify-center">
+            <div className="flex flex-wrap gap-2">
               {TEAM_COLORS.map((c) => {
                 const isUsedByOther = usedColorsByOthers.includes(c);
                 const isSelected = color === c;
@@ -85,16 +86,14 @@ export default function EditTeamDialog({ team, allTeams, onClose }: EditTeamDial
                     key={c}
                     type="button"
                     onClick={() => setColor(c)}
-                    className="cursor-pointer focus:outline-none flex items-center justify-center p-1"
+                    aria-label="Choose team color"
+                    aria-pressed={isSelected}
+                    className={cn(
+                      "rounded-full transition-all",
+                      isSelected ? "scale-100 opacity-100 ring-2 ring-ring ring-offset-2 ring-offset-background" : "scale-90 opacity-40 hover:opacity-70"
+                    )}
                   >
-                    <div
-                      className={cn(
-                        "transition-all duration-300 flex items-center justify-center",
-                        isSelected ? "opacity-100 scale-100" : "opacity-40 hover:opacity-60 scale-90",
-                      )}
-                    >
-                      <Token team={{ ...team, name, color: c }} />
-                    </div>
+                    <TeamDisc team={{ ...team, name, color: c }} size={40} />
                   </button>
                 );
               })}
@@ -102,26 +101,15 @@ export default function EditTeamDialog({ team, allTeams, onClose }: EditTeamDial
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-border/40">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-secondary text-secondary hover:bg-secondary hover:text-app-black hover:shadow-[0_0_15px_var(--color-secondary)] transition-all duration-300 font-mono text-xs uppercase tracking-widest cursor-pointer active:scale-95 flex items-center justify-center gap-1.5"
-          >
-            <X className="w-3.5 h-3.5" />
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
-          </button>
+          </Button>
 
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={!name.trim()}
-            className="px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-widest bg-primary/15 border border-primary text-primary hover:bg-primary hover:text-app-black transition-all duration-300 shadow-[0_0_15px_rgba(var(--primary-rgb,0,255,200),0.25)] hover:shadow-[0_0_20px_rgba(var(--primary-rgb,0,255,200),0.8)] disabled:opacity-30 disabled:pointer-events-none flex items-center gap-1.5 cursor-pointer active:scale-95"
-          >
-            <Save className="w-3.5 h-3.5" />
-            <span>Save</span>
-          </button>
-        </div>
+          <Button type="button" onClick={handleSave} disabled={!name.trim()}>
+            Save changes
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
