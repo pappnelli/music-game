@@ -17,7 +17,7 @@ export default function RoundSolutionMedia({ showSolution, currentSong, teamColo
 
   return (
     <Card className="h-full min-h-0 p-4">
-      <div className="flex h-full min-h-0 flex-col items-center justify-center gap-3 overflow-y-auto text-center">
+      <div className="flex h-full min-h-0 flex-col items-center justify-center gap-3 overflow-y-auto text-center overflow-x-hidden">
         {!showSolution ? (
           <>
             <span className="flex shrink-0 items-center gap-1.5 text-xs font-black tracking-wide text-primary uppercase">

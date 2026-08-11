@@ -40,7 +40,7 @@ function DiscLabel({ size, label }: { size: number; label?: ReactNode }) {
         fontSize: Math.max(7, Math.round(size * 0.16)),
       }}
     >
-      {label}
+      {/* {label} */}
     </span>
   );
 }
@@ -72,11 +72,17 @@ export default function Disc({
 
   return (
     <span
-      className={cn("relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-card", className)}
+      className={cn(
+        "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-card",
+        className,
+      )}
       style={outerStyle}
     >
       {spin ? (
-        <span className="absolute inset-0 rounded-full" style={{ ...faceStyle(colorA, colorB), animation: `spin ${spinDuration} linear infinite` }} />
+        <span
+          className="absolute inset-0 rounded-full"
+          style={{ ...faceStyle(colorA, colorB), animation: `spin ${spinDuration} linear infinite` }}
+        />
       ) : (
         <span className="absolute inset-0 rounded-full" style={faceStyle(colorA, colorB)} />
       )}

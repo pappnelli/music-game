@@ -26,7 +26,7 @@ function tokenSplit(color: string | undefined) {
   return `conic-gradient(from 135deg, color-mix(in oklch, ${color}, white 35%) 0deg 180deg, color-mix(in oklch, ${color}, black 25%) 180deg 360deg)`;
 }
 
-export default function Token({ team, className, type, size = "default", compact = false }: TokenProps) {
+export default function Token({ team, className, type, size = "default", compact = true }: TokenProps) {
   const { color, id: teamId, name: teamName } = team ?? {};
 
   const isGuessingCard = type === "guessing-card" || type === "timeline-guessing-card";
@@ -58,7 +58,7 @@ export default function Token({ team, className, type, size = "default", compact
         className={cn(
           "group/badge relative flex shrink-0 items-center justify-center rounded-full text-white transition-transform duration-300 ease-out hover:scale-110",
           BADGE_SIZES[size],
-          className
+          className,
         )}
         style={
           {
@@ -96,7 +96,7 @@ export default function Token({ team, className, type, size = "default", compact
           compact ? "size-12 sm:size-14" : "size-16 sm:size-18",
           !isDragging && "[animation:token-float_3s_ease-in-out_infinite]",
           isDragging && "z-10 scale-105 rotate-3 opacity-90",
-          className
+          className,
         )}
         title={teamName}
       >
@@ -107,7 +107,7 @@ export default function Token({ team, className, type, size = "default", compact
           className={cn(
             "absolute flex items-center justify-center rounded-full border-2 border-white/70 text-white shadow [animation:wiggle_1.4s_ease-in-out_infinite]",
             isGuessingCard ? "bg-accent" : "bg-secondary",
-            compact ? "-top-1 -right-1 size-4" : "-top-1.5 -right-1.5 size-5"
+            compact ? "-top-1 -right-1 size-4" : "-top-1.5 -right-1.5 size-5",
           )}
         >
           <AccentIcon className={cn(compact ? "size-2.5" : "size-3", isStealToken && "fill-current")} strokeWidth={2.5} />

@@ -26,9 +26,15 @@ export default function WinnerView({ winners }: WinnerViewProps) {
 
   return (
     <div className="relative flex flex-col items-center gap-4 overflow-hidden rounded-3xl border-2 border-primary bg-card p-6 text-center shadow-[0_6px_0_0_color-mix(in_oklch,var(--primary),black_25%)] [animation:pop-in_0.5s_cubic-bezier(0.34,1.56,0.64,1)] sm:p-8">
-      <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-primary via-secondary to-accent" />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-primary via-secondary to-accent"
+      />
       <Sparkles aria-hidden className="absolute top-6 left-6 size-4 text-accent/70 [animation:pop-in_2.2s_ease-in-out_infinite]" />
-      <Sparkles aria-hidden className="absolute right-8 bottom-8 size-3 text-secondary/70 [animation:pop-in_2.6s_ease-in-out_infinite] [animation-delay:0.4s]" />
+      <Sparkles
+        aria-hidden
+        className="absolute right-8 bottom-8 size-3 text-secondary/70 [animation:pop-in_2.6s_ease-in-out_infinite] [animation-delay:0.4s]"
+      />
       <PartyPopper aria-hidden className="absolute top-8 right-8 size-5 text-primary/50 [animation:token-float_3s_ease-in-out_infinite]" />
 
       <span className="flex size-16 items-center justify-center rounded-full border-2 border-primary bg-primary/10 shadow-[0_4px_0_0_color-mix(in_oklch,var(--primary),black_25%)] [animation:wiggle_2.4s_ease-in-out_infinite]">
@@ -48,10 +54,7 @@ export default function WinnerView({ winners }: WinnerViewProps) {
           </span>
         ))}
 
-        <span className="flex items-center gap-1.5 text-primary">
-          <PartyPopper className="size-6" />
-          {isTie ? "tied for the win!" : "won!"}
-        </span>
+        <span className="flex items-center gap-1.5 text-muted-foreground">{isTie ? "tied for the win!" : "won!"}</span>
       </h1>
 
       <Button type="button" size="lg" onClick={handleBackToHome} className="transition-transform hover:scale-[1.02]">

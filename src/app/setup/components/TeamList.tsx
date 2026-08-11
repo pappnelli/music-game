@@ -11,6 +11,7 @@ import { TEAM_NAME_CLASS, teamNameGlowStyle } from "@/lib/teamColors";
 import { cn } from "@/lib/utils";
 import EditTeamDialog from "./EditTeamDialog";
 import { useState } from "react";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 
 interface TeamListProps {
   teams: Team[];
@@ -53,11 +54,17 @@ export default function TeamList({ teams, onRemoveTeam, reorderTeams }: TeamList
 
   return (
     <>
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd}>
         <SortableContext items={teams} strategy={verticalListSortingStrategy}>
           <div className="flex flex-col gap-2">
             {teams.map((team, index) => (
-              <SortableTeamItem key={team.id} team={team} index={index} onEditTeam={() => setEditingId(team.id)} onRemoveTeam={onRemoveTeam} />
+              <SortableTeamItem
+                key={team.id}
+                team={team}
+                index={index}
+                onEditTeam={() => setEditingId(team.id)}
+                onRemoveTeam={onRemoveTeam}
+              />
             ))}
           </div>
         </SortableContext>
@@ -90,7 +97,7 @@ function SortableTeamItem({ team, index, onEditTeam, onRemoveTeam }: SortableTea
       style={style}
       className={cn(
         "flex items-center gap-2 rounded-xl border-2 border-border bg-muted/40 py-1.5 pr-1.5 pl-2.5 transition-shadow",
-        isDragging ? "cursor-grabbing border-primary shadow-[0_4px_0_0_color-mix(in_oklch,var(--primary),black_25%)]" : "backdrop-blur-sm"
+        isDragging ? "cursor-grabbing border-primary shadow-[0_4px_0_0_color-mix(in_oklch,var(--primary),black_25%)]" : "backdrop-blur-sm",
       )}
     >
       <span className="w-5 shrink-0 text-center text-xs font-black text-muted-foreground">{index + 1}</span>

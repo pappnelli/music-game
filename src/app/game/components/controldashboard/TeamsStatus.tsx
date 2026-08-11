@@ -56,8 +56,8 @@ export default function TeamsStatus({ teams, currentTeamId, cardPosition, showSo
               className={cn(
                 "flex w-full min-w-0 shrink-0 flex-col gap-2 rounded-xl border-2 p-2.5 transition-all [animation:pop-in_0.35s_cubic-bezier(0.34,1.56,0.64,1)_backwards]",
                 isActive
-                  ? "scale-[1.01] border-primary bg-primary/10 shadow-[0_4px_0_0_color-mix(in_oklch,var(--primary),black_25%)]"
-                  : "border-border bg-card/60"
+                  ? "border-primary bg-primary/10 shadow-[0_4px_0_0_color-mix(in_oklch,var(--primary),black_25%)]"
+                  : "border-border bg-card/60",
               )}
             >
               <div className="flex min-w-0 items-center gap-2">
@@ -88,7 +88,7 @@ export default function TeamsStatus({ teams, currentTeamId, cardPosition, showSo
                 <div
                   className={cn(
                     "flex size-12 shrink-0 items-center justify-center transition-opacity duration-300 sm:size-14",
-                    actionSlotVisible ? "opacity-100" : "invisible opacity-0"
+                    actionSlotVisible ? "opacity-100" : "invisible opacity-0",
                   )}
                 >
                   {isActive ? <Token team={team} type="guessing-card" compact /> : <Token team={team} type="token" compact />}

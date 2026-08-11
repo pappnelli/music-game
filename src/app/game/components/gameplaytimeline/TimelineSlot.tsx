@@ -50,23 +50,36 @@ export default function TimelineSlot({ index, isOver, active, ref }: SlotProps) 
   const baseClasses = "h-full min-h-16 rounded-lg transition-all duration-200 flex items-center justify-center relative shrink-0";
 
   const stateClasses = isHighlighted
-    ? "mx-2 w-12 border-2 border-dashed border-primary bg-primary/15 animate-pulse"
+    ? "w-50 mx-[-64px]"
     : isFilled
-      ? "mx-2 border-none bg-transparent"
-      : "w-12 mx-[-16px] before:absolute before:h-3/4 before:w-1 before:rounded-full before:bg-border/60";
+      ? "w-50 mx-[-64px]"
+      : "w-36 mx-[-64px] before:absolute before:h-3/4 before:w-1 before:rounded-full before:bg-border/60";
+
+  const slotClasses = isHighlighted
+    ? "w-14 h-3/4 border-2 border-dashed border-primary bg-primary/15 animate-pulse"
+    : isFilled
+      ? "w-14 h-3/4 border-none bg-transparent"
+      : "w-4 h-3/4";
 
   return (
     <div ref={ref} className={cn(baseClasses, stateClasses)}>
-      {isCardPlaced && (
-        <div>
-          <Token team={teams.find((t) => t.id === currentTeamId)} type={showSolution ? null : "timeline-guessing-card"} />
-        </div>
-      )}
-      {isTokenPlaced && (
-        <div>
-          <Token team={teams.find((t) => t.id === tokenAtPosition?.teamId)} type={showSolution ? null : "timeline-token"} />
-        </div>
-      )}
+      <div
+        className={cn(
+          "h-full min-h-16 rounded-lg transition-all duration-200 flex items-center justify-center relative shrink-0",
+          slotClasses,
+        )}
+      >
+        {isCardPlaced && (
+          <div>
+            <Token team={teams.find((t) => t.id === currentTeamId)} type={showSolution ? null : "timeline-guessing-card"} />
+          </div>
+        )}
+        {isTokenPlaced && (
+          <div>
+            <Token team={teams.find((t) => t.id === tokenAtPosition?.teamId)} type={showSolution ? null : "timeline-token"} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

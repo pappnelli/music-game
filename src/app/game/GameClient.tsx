@@ -149,11 +149,15 @@ export default function GameClient() {
                 />
               </div>
 
-              <div className="min-h-0 lg:h-full lg:w-52 lg:shrink-0">
-                <RoundSolutionMedia showSolution={showSolution} currentSong={currentSong} teamColor={teams.find((t) => t.id === currentTeamId)?.color} />
+              <div className="min-h-0 lg:h-full lg:w-60 lg:shrink-0">
+                <RoundSolutionMedia
+                  showSolution={showSolution}
+                  currentSong={currentSong}
+                  teamColor={teams.find((t) => t.id === currentTeamId)?.color}
+                />
               </div>
 
-              <div className="min-h-0 lg:h-full lg:w-56 lg:shrink-0">
+              <div className="min-h-0 lg:h-full lg:w-60 lg:shrink-0">
                 <ActionsPanel
                   showSolution={showSolution}
                   currentSong={currentSong}

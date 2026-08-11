@@ -31,7 +31,7 @@ export default function TeamSummary({ teams }: TeamSummaryProps) {
               key={team.id}
               className={cn(
                 "flex flex-col gap-2 rounded-xl border-2 p-3 transition-all [animation:pop-in_0.4s_cubic-bezier(0.34,1.56,0.64,1)_backwards]",
-                rank !== 0 && "border-border bg-muted/30"
+                rank !== 0 && "border-border bg-muted/30",
               )}
               style={{
                 animationDelay: `${rank * 90}ms`,

@@ -36,9 +36,9 @@ export function teamNameGlowStyle(color: string | undefined): CSSProperties {
 
   return {
     color,
-    WebkitTextStroke: "1.2px #fdf6ff",
+    WebkitTextStroke: "1.2px var(--app-black)",
     paintOrder: "stroke fill",
-    filter: "drop-shadow(0 1px 0 rgba(20, 10, 43, 0.3))",
+    filter: `drop-shadow(0 1px 0 rgb(from ${color} r g b / 0.5))`,
   };
 }
 
