@@ -2,9 +2,11 @@
 
 import { abortGame, moveCard, moveToken, placeCard, placeToken } from "@/lib/store/gameSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
+import { useAppNavigate } from "@/lib/useAppNavigate";
+import { useEdgeFadeStyle } from "@/lib/useEdgeFade";
 import { Active, DndContext, DragEndEvent, DragOverlay, DragStartEvent } from "@dnd-kit/core";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import GameplayTimeline from "./components/GameplayTimeline";
 
@@ -21,23 +23,30 @@ import Token from "./components/Token";
 
 export default function GameClient() {
   const router = useRouter();
+  const navigate = useAppNavigate();
   const dispatch = useAppDispatch();
 
   const { teams, status, currentTeamId, musicMode, tokens, cardPosition, showSolution, currentSong } = useAppSelector((s) => s.game);
 
   useEffect(() => {
     if (status === "finished") {
-      router.push("/end");
-    } else if (status === "idle" || status === "aborted") {
-      router.push("/setup");
+      navigate("/end", "Tallying the results…");
+    } else if (status === "idle") {
+      navigate("/setup");
+    } else if (status === "aborted") {
+      navigate("/");
     } else if (musicMode === "spotify") {
+      // Same-page query update, not a page navigation — no loading screen needed.
       router.push("/game?playback=active");
     }
-  }, [status, router, musicMode]);
+  }, [status, router, navigate, musicMode]);
 
   const [active, setActive] = useState<Active | null>(null);
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const timelineFadeStyle = useEdgeFadeStyle(timelineRef, "x");
 
   const currentIndex = teams.findIndex((t) => t.id === currentTeamId);
   const reorderedTeams = [...teams.slice(currentIndex), ...teams.slice(0, currentIndex)];
@@ -93,7 +102,7 @@ export default function GameClient() {
 
   const handleAbortGame = () => {
     dispatch(abortGame());
-    router.push("/");
+    navigate("/");
   };
 
   if (status === "idle" || status === "finished" || status === "aborted") {
@@ -133,12 +142,18 @@ export default function GameClient() {
           </header>
 
           <main className="flex flex-1 flex-col gap-3 overflow-y-auto p-3 sm:p-4 lg:overflow-hidden">
-            <div className="flex h-36 shrink-0 items-center overflow-x-auto rounded-2xl border-2 border-primary/25 bg-card/60 px-4 shadow-[0_4px_0_0_var(--border)] sm:h-40">
-              <GameplayTimeline teamId={currentTeamId} active={active} />
+            <div className="h-36 shrink-0 overflow-hidden rounded-2xl border-2 border-primary/25 bg-card/60 shadow-[0_4px_0_0_var(--border)] sm:h-40">
+              <div
+                ref={timelineRef}
+                style={timelineFadeStyle}
+                className="flex h-full items-center overflow-x-auto px-4 pb-3"
+              >
+                <GameplayTimeline teamId={currentTeamId} active={active} />
+              </div>
             </div>
 
             <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:items-stretch lg:overflow-hidden">
-              <div className="min-h-0 min-w-0 flex-1 lg:h-full">
+              <div className="min-h-0 min-w-0 flex-1 lg:h-auto lg:mb-1.5">
                 <TeamsStatus
                   teams={reorderedTeams}
                   currentTeamId={currentTeamId}
@@ -149,7 +164,7 @@ export default function GameClient() {
                 />
               </div>
 
-              <div className="min-h-0 lg:h-full lg:w-60 lg:shrink-0">
+              <div className="min-h-0 lg:h-auto lg:mb-1.5 lg:w-60 lg:shrink-0">
                 <RoundSolutionMedia
                   showSolution={showSolution}
                   currentSong={currentSong}
@@ -157,7 +172,7 @@ export default function GameClient() {
                 />
               </div>
 
-              <div className="min-h-0 lg:h-full lg:w-60 lg:shrink-0">
+              <div className="min-h-0 lg:h-auto lg:mb-1.5 lg:w-60 lg:shrink-0">
                 <ActionsPanel
                   showSolution={showSolution}
                   currentSong={currentSong}

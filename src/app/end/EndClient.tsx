@@ -4,12 +4,16 @@ import AppBackground from "@/components/AppBackground";
 import Disc from "@/components/Disc";
 import ThemeToggle from "@/components/ThemeToggle";
 import { useAppSelector } from "@/lib/store/hooks";
+import { useEdgeFadeStyle } from "@/lib/useEdgeFade";
+import { useRef } from "react";
 import NoSongsView from "./components/NoSongsView";
 import TeamSummary from "./components/TeamSummary";
 import WinnerView from "./components/WinnerView";
 
 export default function EndClient() {
   const { winnerIds, teams } = useAppSelector((s) => s.game);
+  const mainRef = useRef<HTMLElement>(null);
+  const mainFadeStyle = useEdgeFadeStyle(mainRef, "y");
 
   const winningTeams = teams.filter((t) => winnerIds.includes(t.id));
 
@@ -25,12 +29,12 @@ export default function EndClient() {
         <ThemeToggle />
       </header>
 
-      <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:overflow-hidden">
+      <main ref={mainRef} style={mainFadeStyle} className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:overflow-hidden">
         <div className="mx-auto flex h-full max-w-4xl flex-col gap-6 lg:overflow-hidden">
           {winningTeams.length === 0 && <NoSongsView />}
           {winningTeams.length > 0 && <WinnerView winners={winningTeams} />}
 
-          <div className="min-h-0 flex-1 lg:overflow-y-auto">
+          <div className="mb-1.5 flex min-h-0 flex-1 flex-col">
             <TeamSummary teams={teams} />
           </div>
         </div>

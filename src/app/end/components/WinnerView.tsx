@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { TeamDisc } from "@/components/Disc";
-import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/lib/store/hooks";
+import { useAppNavigate } from "@/lib/useAppNavigate";
 import { resetGame } from "@/lib/store/gameSlice";
 import { Team } from "@/lib/store/gameSlice";
 import { TEAM_NAME_CLASS, teamNameGlowStyle } from "@/lib/teamColors";
@@ -14,14 +14,14 @@ interface WinnerViewProps {
 }
 
 export default function WinnerView({ winners }: WinnerViewProps) {
-  const router = useRouter();
+  const navigate = useAppNavigate();
   const dispatch = useAppDispatch();
 
   const isTie = winners.length > 1;
 
   const handleBackToHome = () => {
     dispatch(resetGame());
-    router.push("/");
+    navigate("/");
   };
 
   return (

@@ -5,7 +5,7 @@ import Disc from "@/components/Disc";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Card } from "@/components/ui/card";
 import { loadSongs } from "@/lib/songLoader";
-import { Team as GameTeam, selectFilteredSongs, Song, startGame, storeGlobalCatalog } from "@/lib/store/gameSlice";
+import { clearAbortedStatus, Team as GameTeam, selectFilteredSongs, Song, startGame, storeGlobalCatalog } from "@/lib/store/gameSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import {
   addTeam,
@@ -24,10 +24,11 @@ import {
   Team,
 } from "@/lib/store/setupSlice";
 import { getUniqueTeamColor } from "@/lib/teamColors";
+import { useAppNavigate } from "@/lib/useAppNavigate";
+import { useEdgeFadeStyle } from "@/lib/useEdgeFade";
 import { Disc3, ListMusic, Sliders, Users } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import BackButton from "./components/BackButton";
 import FinalRoundRuleSelector from "./components/FinalRoundRuleSelector";
 import GenreSelector from "./components/GenreSelector";
@@ -41,7 +42,7 @@ import WinnerCardsSelector from "./components/WinnerCardsSelector";
 import YearRangeSelector from "./components/YearRangeSelector";
 
 export default function SetupClient() {
-  const router = useRouter();
+  const navigate = useAppNavigate();
   const dispatch = useAppDispatch();
   const [isParsingExcel, setIsParsingExcel] = useState(true);
 
@@ -51,6 +52,7 @@ export default function SetupClient() {
   const { genre, genres, yearStart, yearEnd, songsPerYear, startingTokens, winCondition, teams, musicMode, finalRoundRule } =
     useAppSelector((s) => s.setup);
 
+  const gameStatus = useAppSelector((s) => s.game.status);
   const filteredSongs = useAppSelector(selectFilteredSongs);
 
   const missingRequirements = [
@@ -97,8 +99,14 @@ export default function SetupClient() {
     loadAndInitializeCatalog();
   }, [dispatch]);
 
+  useEffect(() => {
+    if (gameStatus === "aborted") {
+      dispatch(clearAbortedStatus());
+    }
+  }, [gameStatus, dispatch]);
+
   function handleBack() {
-    router.push("/");
+    navigate("/");
   }
 
   function handleStart() {
@@ -129,7 +137,7 @@ export default function SetupClient() {
 
     dispatch(resetSetup());
 
-    router.push("/game");
+    navigate("/game", "Starting the game…");
   }
 
   function handleRemoveTeam(id: string) {
@@ -139,6 +147,15 @@ export default function SetupClient() {
   function handleReorderTeams(newTeams: Team[]) {
     dispatch(reorderTeams(newTeams));
   }
+
+  const mainRef = useRef<HTMLElement>(null);
+  const mainFadeStyle = useEdgeFadeStyle(mainRef, "y");
+  const musicCardRef = useRef<HTMLDivElement>(null);
+  const musicCardFadeStyle = useEdgeFadeStyle(musicCardRef, "y");
+  const rulesCardRef = useRef<HTMLDivElement>(null);
+  const rulesCardFadeStyle = useEdgeFadeStyle(rulesCardRef, "y");
+  const teamListRef = useRef<HTMLDivElement>(null);
+  const teamListFadeStyle = useEdgeFadeStyle(teamListRef, "y");
 
   if (isParsingExcel) {
     return (
@@ -161,9 +178,17 @@ export default function SetupClient() {
         <ThemeToggle />
       </header>
 
-      <main className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 lg:overflow-hidden">
-        <div className="mx-auto flex h-full max-w-[1600px] flex-col items-stretch gap-5 lg:flex-row lg:justify-center">
-          <Card className="gap-4 p-4 sm:p-5 lg:w-80 lg:shrink-0 lg:overflow-y-auto xl:w-96 [animation:pop-in_0.4s_cubic-bezier(0.34,1.56,0.64,1)_backwards]">
+      <main
+        ref={mainRef}
+        style={mainFadeStyle}
+        className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 lg:overflow-hidden place-content-center"
+      >
+        <div className="mx-auto flex h-fit max-h-full max-w-[1600px] flex-col items-stretch gap-5 lg:flex-row lg:justify-center">
+          <Card
+            ref={musicCardRef}
+            style={musicCardFadeStyle}
+            className="gap-4 p-4 sm:p-5 lg:w-80 lg:shrink-0 lg:overflow-y-auto xl:w-96 [animation:pop-in_0.4s_cubic-bezier(0.34,1.56,0.64,1)_backwards]"
+          >
             <h2 className="flex items-center gap-2 text-sm font-black tracking-wide text-foreground uppercase">
               <ListMusic className="size-4 text-primary" />
               Music
@@ -191,6 +216,8 @@ export default function SetupClient() {
           </Card>
 
           <Card
+            ref={rulesCardRef}
+            style={rulesCardFadeStyle}
             className="gap-4 p-4 sm:p-5 lg:w-72 lg:shrink-0 lg:overflow-y-auto xl:w-80 [animation:pop-in_0.4s_cubic-bezier(0.34,1.56,0.64,1)_backwards] [animation-delay:100ms]"
           >
             <h2 className="flex items-center gap-2 text-sm font-black tracking-wide text-foreground uppercase">
@@ -203,9 +230,7 @@ export default function SetupClient() {
             <FinalRoundRuleSelector value={finalRoundRule} onChange={(v) => dispatch(setFinalRoundRule(v))} />
           </Card>
 
-          <Card
-            className="flex min-h-0 flex-1 flex-col gap-4 p-4 sm:p-5 lg:max-w-md lg:overflow-hidden [animation:pop-in_0.4s_cubic-bezier(0.34,1.56,0.64,1)_backwards] [animation-delay:200ms]"
-          >
+          <Card className="flex min-h-0 flex-1 flex-col gap-4 p-4 sm:p-5 lg:max-w-md lg:overflow-hidden [animation:pop-in_0.4s_cubic-bezier(0.34,1.56,0.64,1)_backwards] [animation-delay:200ms]">
             <h2 className="flex items-center gap-2 text-sm font-black tracking-wide text-foreground uppercase">
               <Users className="size-4 text-accent" />
               Teams
@@ -213,7 +238,7 @@ export default function SetupClient() {
 
             <NewTeamInput onAddTeam={(name) => dispatch(addTeam({ id: crypto.randomUUID(), name, color: getUniqueTeamColor(teams) }))} />
 
-            <div className="min-h-0 flex-1 lg:overflow-y-auto">
+            <div ref={teamListRef} style={teamListFadeStyle} className="min-h-0 flex-1 lg:overflow-y-auto">
               <TeamList teams={teams} onRemoveTeam={handleRemoveTeam} reorderTeams={handleReorderTeams} />
             </div>
           </Card>

@@ -1,8 +1,10 @@
 "use client";
 
 import Disc from "@/components/Disc";
+import { useElementWidth } from "@/lib/useElementWidth";
 import { ReactQRCode } from "@lglab/react-qr-code";
 import { QrCode } from "lucide-react";
+import { useRef } from "react";
 
 interface Props {
   spotifyId: string | undefined;
@@ -11,6 +13,10 @@ interface Props {
 }
 
 export default function QRCodeDisplay({ spotifyId, color = "var(--primary)" }: Props) {
+  const frameRef = useRef<HTMLDivElement>(null);
+  const frameWidth = useElementWidth(frameRef);
+  const qrSize = Math.max(1, Math.floor(frameWidth));
+
   if (!spotifyId) {
     return (
       <div className="flex aspect-square w-full max-w-32 shrink-0 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border text-center">
@@ -26,7 +32,8 @@ export default function QRCodeDisplay({ spotifyId, color = "var(--primary)" }: P
   // scanning reliably in both themes.
   return (
     <div
-      className="relative mt-4 w-fit shrink-0 rounded-3xl border-2 p-4 pt-5"
+      ref={frameRef}
+      className="relative mt-4 w-full shrink-0 rounded-3xl border-2 p-4 pt-5 mb-2"
       style={{
         borderColor: `color-mix(in oklch, ${color}, transparent 50%)`,
         background: `linear-gradient(165deg, color-mix(in oklch, ${color}, var(--background) 85%), var(--background) 50%)`,
@@ -49,16 +56,31 @@ export default function QRCodeDisplay({ spotifyId, color = "var(--primary)" }: P
         shadow={`0 3px 0 0 color-mix(in oklch, ${color}, black 25%)`}
       />
 
-      <div className="relative mt-2 rounded-xl bg-[#fdf9ff] p-2.5 shadow-[inset_0_1px_3px_rgba(0,0,0,0.12)]">
-        <ReactQRCode
-          level="L"
-          size={132}
-          value={spotifyId}
-          dataModulesSettings={{ style: "rounded", color: "#201640" }}
-          finderPatternOuterSettings={{ style: "rounded", color: "#201640" }}
-          finderPatternInnerSettings={{ style: "rounded", color: "#201640" }}
-        />
-      </div>
+      <ReactQRCode
+        level="Q"
+        size={qrSize}
+        value={spotifyId}
+        // The exact same primary -> secondary -> accent sweep as the top bar right above it
+        // (and the headline text on Home) -- the app's one recurring brand gradient, applied
+        // uniformly across the data modules and both finder-pattern layers so the whole code
+        // reads as one on-brand surface instead of colored eyes on a plain black grid. Fixed
+        // hex, not theme-tokenized, so the surface never changes between themes.
+        // `level="Q"` adds real redundancy since a bright gradient has less raw contrast than
+        // solid ink -- cheap for a payload this short.
+        gradient={{
+          type: "linear",
+          rotation: 0,
+          stops: [
+            { offset: "0%", color: "#ff2ec4" },
+            { offset: "50%", color: "#9b30ff" },
+            { offset: "100%", color: "#00b8d4" },
+          ],
+        }}
+        dataModulesSettings={{ style: "rounded" }}
+        finderPatternOuterSettings={{ style: "rounded" }}
+        finderPatternInnerSettings={{ style: "circle" }}
+        svgProps={{ style: { display: "block" } }}
+      />
     </div>
   );
 }

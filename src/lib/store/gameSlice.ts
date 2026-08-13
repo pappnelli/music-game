@@ -383,6 +383,12 @@ export const gameSlice = createSlice({
       // return initialState;
     },
 
+    clearAbortedStatus(state) {
+      if (state.status === "aborted") {
+        state.status = "idle";
+      }
+    },
+
     loadSavedGame(state, action: PayloadAction<GameState>) {
       return { ...state, ...action.payload };
     },
@@ -463,6 +469,7 @@ export const {
   nextRound,
   drawNewCard,
   abortGame,
+  clearAbortedStatus,
   loadSavedGame,
   resetGame,
   applyNewFilters,

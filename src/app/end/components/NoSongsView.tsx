@@ -3,16 +3,16 @@
 import { Button } from "@/components/ui/button";
 import { resetGame } from "@/lib/store/gameSlice";
 import { useAppDispatch } from "@/lib/store/hooks";
+import { useAppNavigate } from "@/lib/useAppNavigate";
 import { Home, ListMusic } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export default function NoSongsView() {
-  const router = useRouter();
+  const navigate = useAppNavigate();
   const dispatch = useAppDispatch();
 
   const handleBackToHome = () => {
     dispatch(resetGame());
-    router.push("/");
+    navigate("/");
   };
 
   return (

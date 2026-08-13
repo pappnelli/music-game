@@ -8,9 +8,10 @@ import { RootState } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { drawNewCard, nextRound, removeCard, removeToken, setShowSolution, Song, Team, TokenPlacement } from "@/lib/store/gameSlice";
 import { TEAM_NAME_CLASS, teamNameGlowStyle } from "@/lib/teamColors";
+import { useEdgeFadeStyle } from "@/lib/useEdgeFade";
 import { Check, Eraser, Eye, LucideIcon, Play, Radio, Shuffle, SkipForward, Trophy } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 interface ActionsPanelProps {
@@ -52,6 +53,11 @@ export default function ActionsPanel({ showSolution, currentSong, cardPosition, 
   const musicMode = useSelector((state: RootState) => state.game.musicMode);
 
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
+
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const actionsFadeStyle = useEdgeFadeStyle(actionsRef, "y");
+  const teamsRef = useRef<HTMLDivElement>(null);
+  const teamsFadeStyle = useEdgeFadeStyle(teamsRef, "y");
 
   const spotifyId = currentSong?.spotifyId?.split("/").pop()?.split("?")[0];
   const accessToken = session?.accessToken;
@@ -116,18 +122,23 @@ export default function ActionsPanel({ showSolution, currentSong, cardPosition, 
       </h2>
 
       {!showSolution ? (
-        <div className="flex min-h-0 flex-1 flex-col justify-center gap-3 overflow-x-hidden overflow-y-auto">
-          <div className="relative shrink-0">
-            {cardPosition !== null && (
-              <span aria-hidden className="absolute inset-0 rounded-full bg-primary/50 [animation:ping_2s_cubic-bezier(0,0,0.2,1)_infinite]" />
-            )}
-            <Button type="button" size="lg" disabled={cardPosition === null} onClick={handleReveal} className="relative w-full">
-              <Eye className="size-5" />
-              Reveal Answer
-            </Button>
-          </div>
+        <div
+          ref={actionsRef}
+          style={actionsFadeStyle}
+          className="flex min-h-0 flex-1 flex-col justify-center gap-3 overflow-x-hidden overflow-y-auto"
+        >
+          <Button
+            type="button"
+            size="lg"
+            disabled={cardPosition === null}
+            onClick={handleReveal}
+            className={cn("w-full shrink-0", cardPosition !== null && "[animation:invite-bounce_2.6s_ease-in-out_infinite]")}
+          >
+            <Eye className="size-5" />
+            Reveal Answer
+          </Button>
 
-          <div className="flex shrink-0 items-stretch gap-2">
+          <div className="flex shrink-0 items-stretch gap-2 mb-1">
             <ActionTile icon={Play} label="Play" onClick={handlePlayMusic} disabled={musicMode !== "spotify"} />
             <ActionTile icon={Shuffle} label="Swap" onClick={handleDrawNewCard} />
             <ActionTile icon={Eraser} label="Reset" onClick={handleReset} disabled={usedTokens?.length === 0} />
@@ -137,8 +148,12 @@ export default function ActionsPanel({ showSolution, currentSong, cardPosition, 
         <div className="flex min-h-0 flex-1 flex-col gap-2.5">
           <span className="shrink-0 px-1 text-xs font-semibold text-muted-foreground">Who called it right?</span>
 
-          <div className="flex min-w-0 flex-1 flex-col gap-1.5 overflow-x-hidden overflow-y-auto pr-0.5">
-            {rotatedTeams.map((team) => {
+          <div
+            ref={teamsRef}
+            style={teamsFadeStyle}
+            className="flex min-w-0 flex-1 flex-col gap-1.5 overflow-x-hidden overflow-y-auto pr-0.5"
+          >
+            {rotatedTeams.map((team, i) => {
               const isSelected = selectedTeamId === team.id;
               return (
                 <button
@@ -157,7 +172,8 @@ export default function ActionsPanel({ showSolution, currentSong, cardPosition, 
                   }
                   className={cn(
                     "relative flex w-full min-w-0 shrink-0 items-center gap-2 rounded-xl border-2 px-2.5 py-2 text-left text-xs font-bold transition-all",
-                    !isSelected && "border-border bg-muted/30 opacity-70 hover:opacity-100"
+                    !isSelected && "border-border bg-muted/30 opacity-70 hover:opacity-100",
+                    rotatedTeams.length - 1 === i && "mb-1"
                   )}
                 >
                   <TeamDisc team={team} size={22} className="shrink-0" />

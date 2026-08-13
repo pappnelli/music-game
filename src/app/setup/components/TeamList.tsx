@@ -124,7 +124,7 @@ function SortableTeamItem({ team, index, onEditTeam, onRemoveTeam }: SortableTea
       <div
         {...attributes}
         {...listeners}
-        className="flex cursor-grab items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:text-foreground active:cursor-grabbing"
+        className="flex touch-none cursor-grab items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:text-foreground active:cursor-grabbing"
       >
         <GripVertical size={16} />
       </div>

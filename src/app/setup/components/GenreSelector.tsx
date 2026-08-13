@@ -1,8 +1,10 @@
 "use client";
 
 import { Label } from "@/components/ui/label";
+import { useEdgeFadeStyle } from "@/lib/useEdgeFade";
 import { cn } from "@/lib/utils";
 import { Tags } from "lucide-react";
+import { useRef } from "react";
 
 interface GenreSelectorProps {
   genres: string[];
@@ -11,6 +13,9 @@ interface GenreSelectorProps {
 }
 
 export default function GenreSelector({ genres, selected, onChange }: GenreSelectorProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const fadeStyle = useEdgeFadeStyle(ref, "y");
+
   function toggle(genre: string) {
     if (selected.includes(genre)) {
       onChange(selected.filter((g) => g !== genre));
@@ -29,7 +34,7 @@ export default function GenreSelector({ genres, selected, onChange }: GenreSelec
       {genres.length === 0 ? (
         <p className="text-sm text-muted-foreground">Loading genres from the catalog…</p>
       ) : (
-        <div className="flex max-h-40 flex-wrap gap-2 overflow-y-auto py-0.5">
+        <div ref={ref} style={fadeStyle} className="flex max-h-40 flex-wrap gap-2 overflow-y-auto py-0.5">
           {genres.map((genre) => {
             const isChecked = selected.includes(genre);
 

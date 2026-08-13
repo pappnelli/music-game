@@ -1,10 +1,12 @@
 import { TeamDisc } from "@/components/Disc";
 import { Card } from "@/components/ui/card";
-import { Team, TokenPlacement } from "@/lib/store/gameSlice";
+import { Song, Team, TokenPlacement } from "@/lib/store/gameSlice";
 import { TEAM_NAME_CLASS, teamNameGlowStyle } from "@/lib/teamColors";
+import { useEdgeFadeStyle } from "@/lib/useEdgeFade";
 import { cn } from "@/lib/utils";
 import { Active } from "@dnd-kit/core";
-import { Layers, Mic2, Users, Zap } from "lucide-react";
+import { Coins, DiscAlbum, Mic2, Users } from "lucide-react";
+import { useRef } from "react";
 import SongCard from "../gameplaytimeline/SongCard";
 import Token from "../Token";
 
@@ -18,6 +20,9 @@ interface TeamsStatusProps {
 }
 
 export default function TeamsStatus({ teams, currentTeamId, cardPosition, showSolution, usedTokens, active }: TeamsStatusProps) {
+  const listRef = useRef<HTMLDivElement>(null);
+  const listFadeStyle = useEdgeFadeStyle(listRef, "y");
+
   if (teams.length === 0) {
     return (
       <Card className="h-full items-center justify-center gap-2 border-dashed p-6 text-center">
@@ -37,7 +42,11 @@ export default function TeamsStatus({ teams, currentTeamId, cardPosition, showSo
         Teams
       </h2>
 
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2.5 overflow-x-hidden overflow-y-auto pr-0.5">
+      <div
+        ref={listRef}
+        style={listFadeStyle}
+        className="flex min-h-0 min-w-0 flex-1 flex-col gap-2.5 overflow-x-hidden lg:overflow-y-auto overflow-y-hidden pr-0.5 "
+      >
         {teams.map((team, index) => {
           const isActive = team.id === currentTeamId;
 
@@ -45,74 +54,89 @@ export default function TeamsStatus({ teams, currentTeamId, cardPosition, showSo
           const usedToken = usedTokens.some((t) => t.teamId === team.id);
           const draggingToken = active?.data.current?.teamId === team.id;
           const canUseToken = !isActive && hasToken && !usedToken && cardPosition !== null && !showSolution && !draggingToken;
-          const sortedCards = [...team.cards].sort((a, b) => a.year - b.year);
 
           const actionSlotVisible = isActive ? !showSolution && guessingCardShows : canUseToken;
 
-          return (
-            <div
-              key={team.id}
-              style={{ animationDelay: `${index * 70}ms` }}
-              className={cn(
-                "flex w-full min-w-0 shrink-0 flex-col gap-2 rounded-xl border-2 p-2.5 transition-all [animation:pop-in_0.35s_cubic-bezier(0.34,1.56,0.64,1)_backwards]",
-                isActive
-                  ? "border-primary bg-primary/10 shadow-[0_4px_0_0_color-mix(in_oklch,var(--primary),black_25%)]"
-                  : "border-border bg-card/60",
-              )}
-            >
-              <div className="flex min-w-0 items-center gap-2">
-                <TeamDisc team={team} size={40} className="shrink-0" />
-
-                <div className="flex min-w-0 flex-1 flex-col">
-                  {isActive && (
-                    <span className="flex items-center gap-1 text-xs font-black tracking-wide text-primary uppercase">
-                      <Mic2 className="size-3" />
-                      Now playing
-                    </span>
-                  )}
-                  <span className={cn("truncate text-base", TEAM_NAME_CLASS)} style={teamNameGlowStyle(team.color)}>
-                    {team.name}
-                  </span>
-                  <span className="flex items-center gap-2.5 text-xs font-bold text-muted-foreground">
-                    <span className="flex items-center gap-1 text-secondary">
-                      <Zap className="size-3" />
-                      {team.tokens}
-                    </span>
-                    <span className="flex items-center gap-1 text-primary">
-                      <Layers className="size-3" />
-                      {team.cards.length}
-                    </span>
-                  </span>
-                </div>
-
-                <div
-                  className={cn(
-                    "flex size-12 shrink-0 items-center justify-center transition-opacity duration-300 sm:size-14",
-                    actionSlotVisible ? "opacity-100" : "invisible opacity-0",
-                  )}
-                >
-                  {isActive ? <Token team={team} type="guessing-card" compact /> : <Token team={team} type="token" compact />}
-                </div>
-              </div>
-
-              {!isActive && sortedCards.length > 0 && (
-                <div className="relative flex flex-wrap items-center gap-1.5 px-1 py-0.5">
-                  <span
-                    aria-hidden
-                    className="pointer-events-none absolute inset-x-2 top-1/2 z-0 h-0.5 -translate-y-1/2 rounded-full"
-                    style={{ background: `color-mix(in oklch, ${team.color ?? "var(--border)"}, transparent 15%)` }}
-                  />
-                  {sortedCards.map((song, i) => (
-                    <span key={i} className="relative z-1">
-                      <SongCard song={song} size="small" />
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
+          return <TeamStatusRow key={team.id} team={team} index={index} isActive={isActive} actionSlotVisible={actionSlotVisible} />;
         })}
       </div>
     </Card>
+  );
+}
+
+interface TeamStatusRowProps {
+  team: Team;
+  index: number;
+  isActive: boolean;
+  actionSlotVisible: boolean;
+}
+
+function TeamStatusRow({ team, index, isActive, actionSlotVisible }: TeamStatusRowProps) {
+  const cardsRef = useRef<HTMLDivElement>(null);
+  const cardsFadeStyle = useEdgeFadeStyle(cardsRef, "x");
+  const sortedCards = [...team.cards].sort((a, b) => a.year - b.year);
+
+  return (
+    <div
+      style={{ animationDelay: `${index * 70}ms` }}
+      className={cn(
+        "flex w-full min-w-0 shrink-0 flex-col gap-2 rounded-xl border-2 p-2.5 transition-all [animation:pop-in_0.35s_cubic-bezier(0.34,1.56,0.64,1)_backwards]",
+        isActive
+          ? "border-primary bg-primary/10 shadow-[0_4px_0_0_color-mix(in_oklch,var(--primary),black_25%)]"
+          : "border-border bg-card/60",
+      )}
+    >
+      <div className="flex min-w-0 items-center gap-2">
+        <TeamDisc team={team} size={40} className="shrink-0" />
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          {isActive && (
+            <span className="flex items-center gap-1 text-xs font-black tracking-wide text-primary uppercase">
+              <Mic2 className="size-3" />
+              Now playing
+            </span>
+          )}
+          <span className={cn("truncate text-base", TEAM_NAME_CLASS)} style={teamNameGlowStyle(team.color)}>
+            {team.name}
+          </span>
+          <span className="flex items-center gap-2.5 text-xs font-bold text-muted-foreground">
+            <span className="flex items-center gap-1 text-secondary">
+              <Coins className="size-3" />
+              {team.tokens}
+            </span>
+            <span className="flex items-center gap-1 text-primary">
+              <DiscAlbum className="size-3" />
+              {team.cards.length}
+            </span>
+          </span>
+        </div>
+
+        <div
+          className={cn(
+            "flex size-12 shrink-0 items-center justify-center transition-opacity duration-300 sm:size-14",
+            actionSlotVisible ? "opacity-100" : "invisible opacity-0",
+          )}
+        >
+          {isActive ? <Token team={team} type="guessing-card" compact /> : <Token team={team} type="token" compact />}
+        </div>
+      </div>
+
+      {!isActive && sortedCards.length > 0 && (
+        <div ref={cardsRef} style={cardsFadeStyle} className="overflow-x-auto px-1 pt-0.5 pb-2">
+          <div className="relative flex min-w-max items-center gap-1.5">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-x-2 top-1/2 z-0 h-0.5 -translate-y-1/2 rounded-full"
+              style={{ background: `color-mix(in oklch, ${team.color ?? "var(--border)"}, transparent 15%)` }}
+            />
+            {sortedCards.map((song: Song, i) => (
+              <span key={i} className="relative z-1 shrink-0">
+                <SongCard song={song} size="small" />
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

@@ -4,13 +4,13 @@ import AppBackground from "@/components/AppBackground";
 import Disc from "@/components/Disc";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
+import { useAppNavigate } from "@/lib/useAppNavigate";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { resetSetup } from "@/lib/store/setupSlice";
 import { ListMusic, PlayCircle, Sparkles } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export default function HomeClient() {
-  const router = useRouter();
+  const navigate = useAppNavigate();
   const dispatch = useAppDispatch();
 
   const status = useAppSelector((s) => s.game.status);
@@ -18,11 +18,11 @@ export default function HomeClient() {
 
   function handleNewGame() {
     dispatch(resetSetup());
-    router.push("/setup");
+    navigate("/setup", "Setting up your game…");
   }
 
   function handleContinue() {
-    router.push("/game");
+    navigate("/game", "Loading your game…");
   }
 
   return (

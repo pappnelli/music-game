@@ -1,6 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Song } from "@/lib/store/gameSlice";
+import { useEdgeFadeStyle } from "@/lib/useEdgeFade";
 import { Sparkles, Volume2 } from "lucide-react";
+import { useRef } from "react";
 import SongCard from "../gameplaytimeline/SongCard";
 import RoundWinner from "../statusbar/RoundWinner";
 import QRCodeDisplay from "./QRCodeDisplay";
@@ -14,10 +16,16 @@ interface RoundSolutionMediaProps {
 
 export default function RoundSolutionMedia({ showSolution, currentSong, teamColor }: RoundSolutionMediaProps) {
   const spotifyId = currentSong?.spotifyId;
+  const ref = useRef<HTMLDivElement>(null);
+  const fadeStyle = useEdgeFadeStyle(ref, "y");
 
   return (
     <Card className="h-full min-h-0 p-4">
-      <div className="flex h-full min-h-0 flex-col items-center justify-center gap-3 overflow-y-auto text-center overflow-x-hidden">
+      <div
+        ref={ref}
+        style={fadeStyle}
+        className="flex h-full min-h-0 flex-col items-center justify-center gap-3 overflow-y-auto text-center overflow-x-hidden"
+      >
         {!showSolution ? (
           <>
             <span className="flex shrink-0 items-center gap-1.5 text-xs font-black tracking-wide text-primary uppercase">

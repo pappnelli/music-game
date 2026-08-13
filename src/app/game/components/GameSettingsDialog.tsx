@@ -11,9 +11,10 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { applyNewFilters } from "@/lib/store/gameSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
+import { useEdgeFadeStyle } from "@/lib/useEdgeFade";
 import { ListMusic, Settings, Sliders } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 interface GameSettingsDialogProps {
   open: boolean;
@@ -42,9 +43,12 @@ export default function GameSettingsDialog({ open, onClose }: GameSettingsDialog
     onClose();
   };
 
+  const contentRef = useRef<HTMLDivElement>(null);
+  const fadeStyle = useEdgeFadeStyle(contentRef, "y");
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent ref={contentRef} style={fadeStyle} className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2.5">
             <span className="flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-primary/10 shadow-[0_3px_0_0_color-mix(in_oklch,var(--primary),black_25%)]">
