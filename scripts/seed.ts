@@ -6,7 +6,7 @@ import { songs, type NewSongRow } from "../src/db/schema";
 
 interface RawExcelRow {
   year?: string | number;
-  chart_name?: string | number;
+  genres?: string | number;
   artist?: string | number;
   title?: string | number;
   album?: string | number;
@@ -23,11 +23,14 @@ function parseRows(rawRows: RawExcelRow[]): NewSongRow[] {
         row.year !== undefined && row.artist !== undefined && row.title !== undefined
     )
     .map((row, index) => {
-      let genres = ["egyéb"];
-      if (row.chart_name) {
-        const parsed = String(row.chart_name)
+      // Genre labels (Pop, HipHop, R&B, KPop, ...) are stored with their
+      // display casing intact — no lowercasing, so the UI can render them
+      // directly without a separate display-name lookup.
+      let genres = ["Pop"];
+      if (row.genres) {
+        const parsed = String(row.genres)
           .split(",")
-          .map((g) => g.trim().toLowerCase())
+          .map((g) => g.trim())
           .filter((g) => g.length > 0);
         if (parsed.length > 0) genres = parsed;
       }

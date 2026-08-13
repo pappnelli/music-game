@@ -3,7 +3,7 @@ import { Song } from "./store/gameSlice";
 
 interface RawExcelRow {
   year?: string | number;
-  chart_name?: string | number;
+  genres?: string | number;
   artist?: string | number;
   title?: string | number;
   spotify_url?: string | number;
@@ -16,12 +16,14 @@ function parseExcelRows(rawRows: RawExcelRow[]): Song[] {
         row.year !== undefined && row.artist !== undefined && row.title !== undefined
     )
     .map((row, index) => {
-      // Műfajok feldolgozása vessző mentén (pl. "pop,rock" -> ["pop", "rock"])
-      let parsedGenres: string[] = ["egyéb"];
-      if (row.chart_name) {
-        parsedGenres = String(row.chart_name)
+      // Műfajok feldolgozása vessző mentén (pl. "Pop,Rock" -> ["Pop", "Rock"]).
+      // Display casing intact — mirrors scripts/seed.ts so custom decks match
+      // the same genre strings the DB-backed catalog uses.
+      let parsedGenres: string[] = ["Pop"];
+      if (row.genres) {
+        parsedGenres = String(row.genres)
           .split(",")
-          .map((g) => g.trim().toLowerCase()) // Egységes kisbetűs kezelés a hibák elkerülésére
+          .map((g) => g.trim())
           .filter((g) => g.length > 0);
       }
 
@@ -34,7 +36,7 @@ function parseExcelRows(rawRows: RawExcelRow[]): Song[] {
         title: String(row.title).trim(),
         artist: String(row.artist).trim(),
         year: currentYear,
-        genres: parsedGenres.length > 0 ? parsedGenres : ["egyéb"],
+        genres: parsedGenres.length > 0 ? parsedGenres : ["Pop"],
         spotifyId: row.spotify_url ? String(row.spotify_url).trim() : undefined,
       };
     });

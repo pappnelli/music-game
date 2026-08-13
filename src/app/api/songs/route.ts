@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   if (genresParam) {
     const genreList = genresParam
       .split(",")
-      .map((g) => g.trim().toLowerCase())
+      .map((g) => g.trim())
       .filter(Boolean);
     if (genreList.length > 0) {
       conditions.push(sql`${songs.genres} && ${genreList}`);
