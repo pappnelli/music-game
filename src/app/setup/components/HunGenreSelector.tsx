@@ -2,58 +2,61 @@
 
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import type { HunGenreMode } from "@/lib/store/gameSlice";
 import { cn } from "@/lib/utils";
-import { QrCode, Radio as RadioIcon, Wifi, LucideIcon } from "lucide-react";
-import type { signIn as signInFn } from "next-auth/react";
-import SpotifyConnectButton from "./SpotifyConnectButton";
+import { Ban, Flag, ListMusic, LucideIcon } from "lucide-react";
 
-interface MusicModeSelectorProps {
-  value: "qr" | "spotify";
-  onChange: (mode: "qr" | "spotify") => void;
-  isSpotifyLoggedIn: boolean;
-  signIn: typeof signInFn;
+interface HunGenreSelectorProps {
+  value: HunGenreMode;
+  onChange: (value: HunGenreMode) => void;
 }
 
-interface MusicModeOption {
-  id: "qr" | "spotify";
+interface HunModeOption {
+  id: HunGenreMode;
   label: string;
   hint: string;
   icon: LucideIcon;
 }
 
-const MODES: MusicModeOption[] = [
+const MODES: HunModeOption[] = [
   {
-    id: "qr",
-    label: "QR code",
-    hint: "Players scan a QR code on their own device to reveal and play the track.",
-    icon: QrCode,
+    id: "include",
+    label: "Include normally",
+    hint: "Hungarian-tagged songs stay in the pool alongside everything else.",
+    icon: ListMusic,
   },
   {
-    id: "spotify",
-    label: "Spotify Connect",
-    hint: "Auto-plays through a Spotify device connected to this screen.",
-    icon: Wifi,
+    id: "exclude",
+    label: "Exclude Hungarian songs",
+    hint: "Hungarian-tagged songs are removed from the pool entirely.",
+    icon: Ban,
+  },
+  {
+    id: "only",
+    label: "Hungarian songs only",
+    hint: "Only Hungarian-tagged songs are used; other genre filters are ignored.",
+    icon: Flag,
   },
 ];
 
-export default function MusicModeSelector({ value, onChange, isSpotifyLoggedIn, signIn }: MusicModeSelectorProps) {
+export default function HunGenreSelector({ value, onChange }: HunGenreSelectorProps) {
   return (
     <div className="flex flex-col gap-2">
       <Label className="gap-1.5">
-        <RadioIcon className="size-4 text-accent" />
-        Music playback
+        <Flag className="size-4 text-accent" />
+        Hungarian songs
       </Label>
 
-      <RadioGroup value={value} onValueChange={(v) => onChange(v as "qr" | "spotify")} className="flex flex-col gap-2">
+      <RadioGroup value={value} onValueChange={(v) => onChange(v as HunGenreMode)} className="flex flex-col gap-2">
         {MODES.map((mode) => {
           const isSelected = value === mode.id;
           const Icon = mode.icon;
 
           return (
             <div key={mode.id}>
-              <RadioGroupItem id={`music-mode-${mode.id}`} value={mode.id} className="peer sr-only" />
+              <RadioGroupItem id={`hun-mode-${mode.id}`} value={mode.id} className="peer sr-only" />
               <Label
-                htmlFor={`music-mode-${mode.id}`}
+                htmlFor={`hun-mode-${mode.id}`}
                 className={cn(
                   "flex cursor-pointer flex-row items-start gap-2.5 rounded-xl border-2 px-3 py-2.5 transition-all",
                   isSelected ? "border-primary bg-primary/10" : "border-border bg-muted/40 hover:border-primary/30",
@@ -80,12 +83,6 @@ export default function MusicModeSelector({ value, onChange, isSpotifyLoggedIn, 
           );
         })}
       </RadioGroup>
-
-      {value === "spotify" && (
-        <div className="pt-1">
-          <SpotifyConnectButton isLoggedIn={isSpotifyLoggedIn} onConnect={() => signIn("spotify")} />
-        </div>
-      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import type { HunGenreMode } from "./gameSlice";
 
 export interface Team {
   id: string;
@@ -18,6 +19,7 @@ export interface Song {
 interface SetupState {
   genre: string[];
   genres: string[];
+  hunGenreMode: HunGenreMode;
   yearStart: number;
   yearEnd: number;
   minAvailableYear: number;
@@ -33,6 +35,7 @@ interface SetupState {
 const initialState: SetupState = {
   genre: [],
   genres: [],
+  hunGenreMode: "include",
   yearStart: 1900,
   yearEnd: 2030,
   minAvailableYear: 1900,
@@ -52,8 +55,11 @@ export const setupSlice = createSlice({
     initFiltersFromCatalog(state, action: PayloadAction<Song[]>) {
       const catalog = action.payload;
 
-      // 1. Műfajok kinyerése vesszővel elválasztva (a chart_name mezőből)
-      const uniqueGenres = Array.from(new Set(catalog.flatMap((song) => song.genres))).sort();
+      // 1. Műfajok kinyerése vesszővel elválasztva (a chart_name mezőből).
+      // A "Hun" nem szerepel a listában — azt a külön HunGenreSelector kezeli.
+      const uniqueGenres = Array.from(new Set(catalog.flatMap((song) => song.genres)))
+        .filter((g) => g.trim().toLowerCase() !== "hun")
+        .sort();
 
       // 2. Évszámok határainak kiszámítása
       const years = catalog.map((song) => Number(song.year)).filter(Boolean);
@@ -70,6 +76,9 @@ export const setupSlice = createSlice({
     },
     setGenre(state, action: PayloadAction<string[]>) {
       state.genre = action.payload;
+    },
+    setHunGenreMode(state, action: PayloadAction<HunGenreMode>) {
+      state.hunGenreMode = action.payload;
     },
     setYearStart(state, action: PayloadAction<number>) {
       state.yearStart = action.payload;
@@ -117,6 +126,7 @@ export const setupSlice = createSlice({
 export const {
   initFiltersFromCatalog,
   setGenre,
+  setHunGenreMode,
   setYearStart,
   setYearEnd,
   setSongsPerYear,

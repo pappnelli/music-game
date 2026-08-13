@@ -11,6 +11,8 @@ export interface Song {
   spotifyId?: string;
 }
 
+export type HunGenreMode = "include" | "exclude" | "only";
+
 export interface Team {
   id: string;
   name: string;
@@ -32,6 +34,7 @@ export interface GameState {
   finalRoundRule: "instant" | "complete";
   genres: string[];
   selectedGenres: string[];
+  hunGenreMode: HunGenreMode;
   yearStart: number;
   yearEnd: number;
   songsPerYear: number | null;
@@ -59,6 +62,7 @@ const initialState: GameState = {
   finalRoundRule: "instant",
   genres: [],
   selectedGenres: [],
+  hunGenreMode: "include",
   yearStart: 1900,
   yearEnd: 2026,
   songsPerYear: null,
@@ -127,6 +131,57 @@ function isCorrectPosition(slotIndex: number, teamCards: Song[], currentSong: So
   return false;
 }
 
+// A dal "Hun" (magyar) műfajjal van-e cimkézve, a többi genre-től függetlenül.
+export function isHungarianTagged(song: Song): boolean {
+  return song.genres.some((g) => g.trim().toLowerCase() === "hun");
+}
+
+interface SongFilterCriteria {
+  selectedGenres: string[];
+  yearStart: number;
+  yearEnd: number;
+  hunGenreMode: HunGenreMode;
+}
+
+// Közös szűrő predikátum: Setup, GameSettingsDialog és az applyNewFilters reducer is ezt használja,
+// hogy a "Hun" kezelése (include/exclude/only) mindenhol ugyanúgy viselkedjen.
+export function songMatchesFilters(song: Song, criteria: SongFilterCriteria): boolean {
+  const { selectedGenres, yearStart, yearEnd, hunGenreMode } = criteria;
+
+  if (song.year < yearStart || song.year > yearEnd) return false;
+
+  const isHun = isHungarianTagged(song);
+
+  if (hunGenreMode === "only") return isHun;
+  if (hunGenreMode === "exclude" && isHun) return false;
+  if (hunGenreMode === "include" && isHun) return true; // "Hun" mindig átmegy, mint egy hallgatólagosan kijelölt genre
+
+  return selectedGenres.length === 0 || song.genres.some((g) => selectedGenres.includes(g));
+}
+
+export function capSongsPerYear(songs: Song[], songsPerYear: number | null): Song[] {
+  if (!songsPerYear || songsPerYear <= 0) return songs;
+
+  const countByYear: Record<number, number> = {};
+  return songs.filter((song) => {
+    const current = countByYear[song.year] ?? 0;
+    if (current < songsPerYear) {
+      countByYear[song.year] = current + 1;
+      return true;
+    }
+    return false;
+  });
+}
+
+export function shuffleSongs(songs: Song[]): Song[] {
+  const shuffled = [...songs];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export const gameSlice = createSlice({
   name: "game",
   initialState,
@@ -145,6 +200,7 @@ export const gameSlice = createSlice({
         finalRoundRule: "instant" | "complete";
         selectedGenres?: string[];
         genres?: string[];
+        hunGenreMode?: HunGenreMode;
         yearStart?: number;
         yearEnd?: number;
         songsPerYear?: number | null;
@@ -159,6 +215,7 @@ export const gameSlice = createSlice({
         finalRoundRule,
         selectedGenres,
         genres,
+        hunGenreMode,
         yearStart,
         yearEnd,
         songsPerYear,
@@ -170,6 +227,7 @@ export const gameSlice = createSlice({
       state.finalRoundRule = finalRoundRule;
       if (selectedGenres) state.selectedGenres = selectedGenres;
       if (genres) state.genres = genres;
+      if (hunGenreMode) state.hunGenreMode = hunGenreMode;
       if (yearStart !== undefined) state.yearStart = yearStart;
       if (yearEnd !== undefined) state.yearEnd = yearEnd;
       if (songsPerYear !== undefined) state.songsPerYear = songsPerYear;
@@ -405,6 +463,7 @@ export const gameSlice = createSlice({
       state,
       action: PayloadAction<{
         selectedGenres: string[];
+        hunGenreMode: HunGenreMode;
         yearStart: number;
         yearEnd: number;
         songsPerYear: number | null;
@@ -413,9 +472,10 @@ export const gameSlice = createSlice({
         musicMode: "qr" | "spotify";
       }>,
     ) => {
-      const { selectedGenres, yearStart, yearEnd, songsPerYear, winCondition, finalRoundRule, musicMode } = action.payload;
+      const { selectedGenres, hunGenreMode, yearStart, yearEnd, songsPerYear, winCondition, finalRoundRule, musicMode } = action.payload;
 
       state.selectedGenres = selectedGenres;
+      state.hunGenreMode = hunGenreMode;
       state.yearStart = yearStart;
       state.yearEnd = yearEnd;
       state.songsPerYear = songsPerYear;
@@ -424,34 +484,12 @@ export const gameSlice = createSlice({
       state.musicMode = musicMode;
 
       const usedIds = new Set(state.usedSongs.map((s) => s.id));
-      let availableSongs = state.catalog.filter((song) => !usedIds.has(song.id));
-
-      availableSongs = availableSongs.filter((song) => {
-        const yearMatch = song.year >= yearStart && song.year <= yearEnd;
-        const genreMatch = selectedGenres.length === 0 || song.genres.some((g) => selectedGenres.includes(g));
-        return yearMatch && genreMatch;
-      });
-
-      if (songsPerYear && songsPerYear > 0) {
-        const countByYear: Record<number, number> = {};
-        availableSongs = availableSongs.filter((song) => {
-          const currentCount = countByYear[song.year] || 0;
-          if (currentCount < songsPerYear) {
-            countByYear[song.year] = currentCount + 1;
-            return true;
-          }
-          return false;
-        });
-      }
-
-      const shuffled = [...availableSongs];
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      }
+      const availableSongs = state.catalog.filter(
+        (song) => !usedIds.has(song.id) && songMatchesFilters(song, { selectedGenres, yearStart, yearEnd, hunGenreMode }),
+      );
 
       // 6. Frissítjük a hátramaradt dallistát (songs / deck)
-      state.songs = shuffled;
+      state.songs = shuffleSongs(capSongsPerYear(availableSongs, songsPerYear));
     },
   },
 });
@@ -480,36 +518,18 @@ export default gameSlice.reducer;
 
 export const selectFilteredSongs = (state: RootState) => {
   const catalog = state.game.catalog;
-  const { genre, yearStart, yearEnd, songsPerYear } = state.setup;
+  const { genre, hunGenreMode, yearStart, yearEnd, songsPerYear } = state.setup;
 
-  // 1. lépés: Alapszűrés évek és műfajok alapján
-  const baseFiltered = catalog.filter((song) => {
-    const matchesYear = song.year >= yearStart && song.year <= yearEnd;
-    const matchesGenre = genre.length === 0 || song.genres.some((g) => genre.includes(g));
-    return matchesYear && matchesGenre;
-  });
+  // 1. lépés: Alapszűrés évek, műfajok és a "Hun" mód alapján
+  const baseFiltered = catalog.filter((song) =>
+    songMatchesFilters(song, { selectedGenres: genre, yearStart, yearEnd, hunGenreMode }),
+  );
 
   // 2. lépés: Ha a songsPerYear null, akkor nem korlátozzuk a darabszámot, de a biztonság kedvéért megkeverjük a paklit
   if (songsPerYear === null || songsPerYear <= 0) {
-    return [...baseFiltered].sort(() => Math.random() - 0.5);
+    return shuffleSongs(baseFiltered);
   }
 
-  // 3. lépés: Teljes keverés (Fisher-Yates vagy egyszerűsített) a RANDOM kiválasztáshoz
-  const shuffledBase = [...baseFiltered].sort(() => Math.random() - 0.5);
-
-  // 4. lépés: Évenként csoportosítva csak az első 'songsPerYear' darabot tartjuk meg
-  const yearCounts: Record<number, number> = {};
-
-  return shuffledBase.filter((song) => {
-    if (!yearCounts[song.year]) {
-      yearCounts[song.year] = 0;
-    }
-
-    if (yearCounts[song.year] < songsPerYear) {
-      yearCounts[song.year]++;
-      return true; // Megtartjuk a dalt, mert még nem értük el a limitet ebből az évből
-    }
-
-    return false; // Kihagyjuk, mert ebből az évből már megvan a kívánt darabszám
-  });
+  // 3. lépés: Teljes keverés a RANDOM kiválasztáshoz, majd évenként csak az első 'songsPerYear' darab marad
+  return capSongsPerYear(shuffleSongs(baseFiltered), songsPerYear);
 };

@@ -15,6 +15,7 @@ import {
   resetSetup,
   setFinalRoundRule,
   setGenre,
+  setHunGenreMode,
   setMusicMode,
   setSongsPerYear,
   setStartingTokens,
@@ -32,6 +33,7 @@ import { useEffect, useRef, useState } from "react";
 import BackButton from "./components/BackButton";
 import FinalRoundRuleSelector from "./components/FinalRoundRuleSelector";
 import GenreSelector from "./components/GenreSelector";
+import HunGenreSelector from "./components/HunGenreSelector";
 import MusicModeSelector from "./components/MusicModeSelector";
 import NewTeamInput from "./components/NewTeamInput";
 import SongsPerYearSelector from "./components/SongsPerYearSelector";
@@ -49,16 +51,21 @@ export default function SetupClient() {
   const { status } = useSession();
   const isSpotifyLoggedIn = status === "authenticated";
 
-  const { genre, genres, yearStart, yearEnd, songsPerYear, startingTokens, winCondition, teams, musicMode, finalRoundRule } =
+  const { genre, genres, hunGenreMode, yearStart, yearEnd, songsPerYear, startingTokens, winCondition, teams, musicMode, finalRoundRule } =
     useAppSelector((s) => s.setup);
 
   const gameStatus = useAppSelector((s) => s.game.status);
   const filteredSongs = useAppSelector(selectFilteredSongs);
 
+  const trimmedTeamNames = teams.map((t) => t.name.trim().toLowerCase());
+  const hasDuplicateTeamNames = new Set(trimmedTeamNames).size !== trimmedTeamNames.length;
+
   const missingRequirements = [
     teams.length < 2 && "Add at least 2 teams",
-    genre.length === 0 && "Select at least one genre",
+    hasDuplicateTeamNames && "Team names must be unique",
+    hunGenreMode !== "only" && genre.length === 0 && "Select at least one genre",
     (!yearStart || !yearEnd) && "Set a valid year range",
+    !!yearStart && !!yearEnd && yearStart > yearEnd && "Start year must be before end year",
     filteredSongs.length < teams.length * 2 && "Not enough songs match your filters",
     !winCondition && "Set how many cards win the game",
     musicMode === "spotify" && !isSpotifyLoggedIn && "Connect Spotify to continue",
@@ -123,6 +130,7 @@ export default function SetupClient() {
       startGame({
         selectedGenres: genre,
         genres,
+        hunGenreMode,
         yearStart,
         yearEnd,
         songsPerYear,
@@ -194,7 +202,14 @@ export default function SetupClient() {
               Music
             </h2>
 
-            <GenreSelector genres={genres} selected={genre} onChange={(list) => dispatch(setGenre(list))} />
+            <GenreSelector
+              genres={genres}
+              selected={genre}
+              onChange={(list) => dispatch(setGenre(list))}
+              disabled={hunGenreMode === "only"}
+            />
+
+            <HunGenreSelector value={hunGenreMode} onChange={(mode) => dispatch(setHunGenreMode(mode))} />
 
             <YearRangeSelector
               yearStart={yearStart}
@@ -205,20 +220,13 @@ export default function SetupClient() {
 
             <SongsPerYearSelector value={songsPerYear} onChange={(v) => dispatch(setSongsPerYear(v))} />
 
-            <MusicModeSelector
-              value={musicMode}
-              onChange={(mode) => dispatch(setMusicMode(mode))}
-              isSpotifyLoggedIn={isSpotifyLoggedIn}
-              signIn={signIn}
-            />
-
             <p className="text-xs font-semibold text-muted-foreground">{filteredSongs.length} songs match your filters.</p>
           </Card>
 
           <Card
             ref={rulesCardRef}
             style={rulesCardFadeStyle}
-            className="gap-4 p-4 sm:p-5 lg:w-72 lg:shrink-0 lg:overflow-y-auto xl:w-80 [animation:pop-in_0.4s_cubic-bezier(0.34,1.56,0.64,1)_backwards] [animation-delay:100ms]"
+            className="gap-4 p-4 sm:p-5 lg:w-80 lg:shrink-0 lg:overflow-y-auto xl:w-96 [animation:pop-in_0.4s_cubic-bezier(0.34,1.56,0.64,1)_backwards] [animation-delay:100ms]"
           >
             <h2 className="flex items-center gap-2 text-sm font-black tracking-wide text-foreground uppercase">
               <Sliders className="size-4 text-secondary" />
@@ -228,6 +236,13 @@ export default function SetupClient() {
             <StartTokenSelector value={startingTokens} onChange={(v) => dispatch(setStartingTokens(v))} />
             <WinnerCardsSelector value={winCondition} onChange={(v) => dispatch(setWinCondition(v))} />
             <FinalRoundRuleSelector value={finalRoundRule} onChange={(v) => dispatch(setFinalRoundRule(v))} />
+
+            <MusicModeSelector
+              value={musicMode}
+              onChange={(mode) => dispatch(setMusicMode(mode))}
+              isSpotifyLoggedIn={isSpotifyLoggedIn}
+              signIn={signIn}
+            />
           </Card>
 
           <Card className="flex min-h-0 flex-1 flex-col gap-4 p-4 sm:p-5 lg:max-w-md lg:overflow-hidden [animation:pop-in_0.4s_cubic-bezier(0.34,1.56,0.64,1)_backwards] [animation-delay:200ms]">
