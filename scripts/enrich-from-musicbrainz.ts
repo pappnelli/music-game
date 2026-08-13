@@ -65,6 +65,7 @@ interface MBReleaseGroupRef {
 
 interface MBRelease {
   id: string;
+  title: string;
   date?: string;
   "release-group"?: MBReleaseGroupRef;
 }
