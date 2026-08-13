@@ -1,10 +1,7 @@
-import { config } from "dotenv";
 import fs from "node:fs";
 import path from "node:path";
 import { sql } from "drizzle-orm";
 import * as XLSX from "xlsx";
-
-config({ path: ".env.local" });
 import { db } from "../src/db";
 import { songs, type NewSongRow } from "../src/db/schema";
 
