@@ -10,6 +10,7 @@ export const songs = pgTable("songs", {
   artist: text("artist").notNull(),
   year: integer("year").notNull(),
   genres: text("genres").array().notNull().default([]),
+  album: text("album"),
   spotifyId: text("spotify_id"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });

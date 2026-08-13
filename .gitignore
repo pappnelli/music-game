@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# working data reports (regenerate with npm run enrich:spotify)
+/scripts/output

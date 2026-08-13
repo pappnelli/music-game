@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import { sql } from "drizzle-orm";
 import * as XLSX from "xlsx";
 import { db } from "../src/db";
 import { songs, type NewSongRow } from "../src/db/schema";
@@ -10,10 +9,12 @@ interface RawExcelRow {
   chart_name?: string | number;
   artist?: string | number;
   title?: string | number;
+  album?: string | number;
   spotify_url?: string | number;
 }
 
 const BATCH_SIZE = 500;
+const SOURCE_FILE = "hits-clean.xlsx";
 
 function parseRows(rawRows: RawExcelRow[]): NewSongRow[] {
   return rawRows
@@ -38,13 +39,14 @@ function parseRows(rawRows: RawExcelRow[]): NewSongRow[] {
         artist: String(row.artist).trim(),
         year,
         genres,
+        album: row.album ? String(row.album).trim() : null,
         spotifyId: row.spotify_url ? String(row.spotify_url).trim() : null,
       };
     });
 }
 
 async function seed() {
-  const filePath = path.join(process.cwd(), "public", "hits.xlsx");
+  const filePath = path.join(process.cwd(), "public", SOURCE_FILE);
   const buffer = fs.readFileSync(filePath);
   const workbook = XLSX.read(buffer, { type: "buffer" });
   const worksheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -52,31 +54,27 @@ async function seed() {
 
   const rows = parseRows(rawRows);
   if (rows.length === 0) {
-    console.log("No valid rows found in hits.xlsx — nothing to seed.");
+    console.log(`No valid rows found in ${SOURCE_FILE} — nothing to seed.`);
     return;
   }
+
+  // Full replace rather than upsert-by-id: row order/count can change between
+  // cleanups (dedup, corrections), so position-derived ids aren't stable
+  // across runs. IDs are regenerated client-side on load anyway (see
+  // SetupClient.tsx), so a clean wipe-and-reinsert is simpler and safer than
+  // reconciling stale rows.
+  await db.delete(songs);
+  console.log("Cleared existing songs table.");
 
   let inserted = 0;
   for (let i = 0; i < rows.length; i += BATCH_SIZE) {
     const batch = rows.slice(i, i + BATCH_SIZE);
-    await db
-      .insert(songs)
-      .values(batch)
-      .onConflictDoUpdate({
-        target: songs.id,
-        set: {
-          title: sql`excluded.title`,
-          artist: sql`excluded.artist`,
-          year: sql`excluded.year`,
-          genres: sql`excluded.genres`,
-          spotifyId: sql`excluded.spotify_id`,
-        },
-      });
+    await db.insert(songs).values(batch);
     inserted += batch.length;
     console.log(`Seeded ${inserted}/${rows.length}`);
   }
 
-  console.log(`Done. Seeded ${rows.length} songs (upsert by id, safe to re-run).`);
+  console.log(`Done. Seeded ${rows.length} songs from ${SOURCE_FILE}.`);
 }
 
 seed()

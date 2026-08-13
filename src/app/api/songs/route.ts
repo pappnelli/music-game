@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
       artist: row.artist,
       year: row.year,
       genres: row.genres,
+      album: row.album ?? undefined,
       spotifyId: row.spotifyId ?? undefined,
     }));
 

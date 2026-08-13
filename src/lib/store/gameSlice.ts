@@ -7,6 +7,7 @@ export interface Song {
   artist: string;
   year: number;
   genres: string[];
+  album?: string;
   spotifyId?: string;
 }
 
