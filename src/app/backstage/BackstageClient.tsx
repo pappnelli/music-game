@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { SongRow } from "@/db/schema";
 import { useEdgeFadeStyle } from "@/lib/useEdgeFade";
+import { useMediaQuery } from "@/lib/useMediaQuery";
 import { useVirtualRows } from "@/lib/useVirtualRows";
 import { cn } from "@/lib/utils";
 import { Disc3, ExternalLink, ListMusic, LogOut, Pencil, Plus, Search, Trash2 } from "lucide-react";
@@ -21,7 +22,15 @@ import SongFormDialog from "./components/SongFormDialog";
 
 // Every row must render at exactly this height for the virtualizer's scroll math to hold --
 // keep genre/title/artist/album cells single-line (truncate, no wrapping) if you touch them.
-const ROW_HEIGHT = 44;
+// Two heights because the table (sm+) and the stacked mobile card (<sm) aren't the same shape.
+const DESKTOP_ROW_HEIGHT = 44;
+const MOBILE_ROW_HEIGHT = 88;
+
+/** First two genres for the row/card, plus a count of however many more didn't fit. */
+function splitGenres(genres: string[]) {
+  const visible = genres.slice(0, 2);
+  return { visible, extraCount: genres.length - visible.length };
+}
 
 export default function BackstageClient() {
   const router = useRouter();
@@ -95,12 +104,17 @@ export default function BackstageClient() {
   const tableRef = useRef<HTMLDivElement>(null);
   const tableFadeStyle = useEdgeFadeStyle(tableRef, "y");
 
+  // Below `sm` the fixed-width table has nowhere to put ~50rem of columns, so it's swapped for
+  // a stacked card list instead of just letting the table overflow/scroll sideways.
+  const isMobile = useMediaQuery("(max-width: 639px)");
+  const rowHeight = isMobile ? MOBILE_ROW_HEIGHT : DESKTOP_ROW_HEIGHT;
+
   // Only mount the rows currently in (or near) the viewport -- the catalog runs to 1500+ songs,
   // and rendering every row up front made typing in the search box noticeably laggy.
-  const { startIndex, endIndex } = useVirtualRows(tableRef, filteredSongs.length, ROW_HEIGHT);
+  const { startIndex, endIndex } = useVirtualRows(tableRef, filteredSongs.length, rowHeight);
   const visibleSongs = filteredSongs.slice(startIndex, endIndex);
-  const topSpacerHeight = startIndex * ROW_HEIGHT;
-  const bottomSpacerHeight = (filteredSongs.length - endIndex) * ROW_HEIGHT;
+  const topSpacerHeight = startIndex * rowHeight;
+  const bottomSpacerHeight = (filteredSongs.length - endIndex) * rowHeight;
 
   // A new search/genre filter can leave the scroll position pointing past the end of the
   // (now shorter) list, which would otherwise render nothing until the user manually scrolls up.
@@ -185,6 +199,77 @@ export default function BackstageClient() {
             <div className="flex flex-1 flex-col items-center justify-center gap-2 py-16 text-center">
               <p className="text-sm font-bold text-muted-foreground">No songs match your search.</p>
             </div>
+          ) : isMobile ? (
+            <div ref={tableRef} style={tableFadeStyle} className="flex-1 overflow-y-auto">
+              {topSpacerHeight > 0 && <div aria-hidden style={{ height: topSpacerHeight }} />}
+
+              {visibleSongs.map((song) => {
+                const { visible: visibleGenres, extraCount: extraGenreCount } = splitGenres(song.genres);
+
+                return (
+                  <div
+                    key={song.id}
+                    style={{ height: MOBILE_ROW_HEIGHT }}
+                    className="flex flex-col justify-center gap-1 border-b border-border/60 px-4 py-2"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex min-w-0 items-baseline gap-2">
+                        <span className="shrink-0 text-xs font-black text-primary">{song.year}</span>
+                        <span className="truncate text-sm font-bold text-foreground" title={song.title}>
+                          {song.title}
+                        </span>
+                      </div>
+
+                      <div className="flex shrink-0 items-center gap-0.5">
+                        {song.spotifyId && (
+                          <a
+                            href={`https://open.spotify.com/track/${song.spotifyId}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label="Open in Spotify"
+                            className="flex size-7 items-center justify-center text-accent"
+                          >
+                            <ExternalLink className="size-3.5" />
+                          </a>
+                        )}
+                        <Button variant="ghost" size="icon-sm" aria-label="Edit song" onClick={() => setFormTarget(song)}>
+                          <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          aria-label="Delete song"
+                          className="text-destructive hover:bg-destructive/10"
+                          onClick={() => setDeleteTarget(song)}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <p className="truncate text-xs text-muted-foreground" title={song.artist}>
+                      {song.artist}
+                      {song.album ? ` — ${song.album}` : ""}
+                    </p>
+
+                    <div className="flex flex-nowrap items-center gap-1 overflow-hidden" title={song.genres.join(", ")}>
+                      {visibleGenres.map((genre) => (
+                        <Badge key={genre} variant="outline" className="shrink-0 text-[0.65rem]">
+                          {genre}
+                        </Badge>
+                      ))}
+                      {extraGenreCount > 0 && (
+                        <Badge variant="ghost" className="shrink-0 text-[0.65rem] text-muted-foreground">
+                          +{extraGenreCount}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+
+              {bottomSpacerHeight > 0 && <div aria-hidden style={{ height: bottomSpacerHeight }} />}
+            </div>
           ) : (
             <div ref={tableRef} style={tableFadeStyle} className="flex-1 overflow-y-auto">
               <Table className="table-fixed">
@@ -220,8 +305,7 @@ export default function BackstageClient() {
                   )}
 
                   {visibleSongs.map((song) => {
-                    const visibleGenres = song.genres.slice(0, 2);
-                    const extraGenreCount = song.genres.length - visibleGenres.length;
+                    const { visible: visibleGenres, extraCount: extraGenreCount } = splitGenres(song.genres);
 
                     return (
                       <TableRow key={song.id} className="h-11">

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import NavigationLoadingOverlay from "./NavigationLoadingOverlay";
 
 interface NavigationLoadingContextValue {
@@ -47,16 +47,21 @@ export function NavigationLoadingProvider({ children }: { children: ReactNode })
     };
   }, []);
 
-  function startNavigating(nextMessage = "Loading…") {
+  // Stable identity via useCallback: this goes into context, and downstream consumers
+  // (e.g. useAppNavigate) memoize against it -- a fresh function reference on every render
+  // here silently breaks that memoization for every consumer in the app.
+  const startNavigating = useCallback((nextMessage = "Loading…") => {
     setMessage(nextMessage);
     setIsNavigating(true);
 
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => setIsNavigating(false), SAFETY_TIMEOUT_MS);
-  }
+  }, []);
+
+  const contextValue = useMemo(() => ({ startNavigating }), [startNavigating]);
 
   return (
-    <NavigationLoadingContext.Provider value={{ startNavigating }}>
+    <NavigationLoadingContext.Provider value={contextValue}>
       <RouteChangeListener key={pathname} onRouteReady={clearOverlay} />
       {children}
       {isNavigating && <NavigationLoadingOverlay message={message} />}

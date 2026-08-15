@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { useAppNavigate } from "@/lib/useAppNavigate";
 import { useEdgeFadeStyle } from "@/lib/useEdgeFade";
 import { Active, DndContext, DragEndEvent, DragOverlay, DragStartEvent } from "@dnd-kit/core";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import GameplayTimeline from "./components/GameplayTimeline";
@@ -23,10 +23,12 @@ import Token from "./components/Token";
 
 export default function GameClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const navigate = useAppNavigate();
   const dispatch = useAppDispatch();
 
   const { teams, status, currentTeamId, musicMode, tokens, cardPosition, showSolution, currentSong } = useAppSelector((s) => s.game);
+  const isPlaybackActive = searchParams.get("playback") === "active";
 
   useEffect(() => {
     if (status === "finished") {
@@ -35,11 +37,12 @@ export default function GameClient() {
       navigate("/setup");
     } else if (status === "aborted") {
       navigate("/");
-    } else if (musicMode === "spotify") {
+    } else if (musicMode === "spotify" && !isPlaybackActive) {
       // Same-page query update, not a page navigation — no loading screen needed.
+      // Guarded by isPlaybackActive so this can't re-fire into a navigate loop.
       router.push("/game?playback=active");
     }
-  }, [status, router, navigate, musicMode]);
+  }, [status, router, navigate, musicMode, isPlaybackActive]);
 
   const [active, setActive] = useState<Active | null>(null);
 
