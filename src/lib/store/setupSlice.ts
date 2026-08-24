@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { genrePopularityRank, isHungarianGenre, isOtherGenre } from "@/lib/genreLabels";
 
 export interface Team {
   id: string;
@@ -55,7 +56,12 @@ export const setupSlice = createSlice({
       // 1. Műfajok kinyerése vesszővel elválasztva (a chart_name mezőből). A magyar műfajok
       // (hun-pop, hun-rock, stb.) egyedi genre értékek, ugyanúgy szerepelnek itt, mint bármelyik
       // más -- a GenreSelector csoportosítja/rendezi őket külön, dedikált szekcióba a UI-ban.
-      const uniqueGenres = Array.from(new Set(catalog.flatMap((song) => song.genres))).sort();
+      // Sorrend: fő műfajok népszerűség szerint (pop elöl), utána a magyar műfajok (ugyanabban a
+      // népszerűségi sorrendben), a "B" adatminőségi jelölő pedig mindig a lista legvégén.
+      const uniqueGenres = Array.from(new Set(catalog.flatMap((song) => song.genres))).sort((a, b) => {
+        const bucket = (g: string) => (isOtherGenre(g) ? 2 : isHungarianGenre(g) ? 1 : 0);
+        return bucket(a) - bucket(b) || genrePopularityRank(a) - genrePopularityRank(b);
+      });
 
       // 2. Évszámok határainak kiszámítása
       const years = catalog.map((song) => Number(song.year)).filter(Boolean);

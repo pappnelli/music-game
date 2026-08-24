@@ -1,7 +1,7 @@
 "use client";
 
 import { Label } from "@/components/ui/label";
-import { genreLabel, isHungarianGenre } from "@/lib/genreLabels";
+import { genreLabel, isHungarianGenre, isOtherGenre } from "@/lib/genreLabels";
 import { useEdgeFadeStyle } from "@/lib/useEdgeFade";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Flag, Tags } from "lucide-react";
@@ -28,14 +28,19 @@ export default function GenreSelector({ genres, selected, onChange }: GenreSelec
   const fadeStyle = useEdgeFadeStyle(ref, "y");
   const [isHunOpen, setIsHunOpen] = useState(false);
 
-  const mainGenres = genres.filter((g) => !isHungarianGenre(g));
+  // "B" is a stray data-quality flag in the catalog, not a real genre -- it's always shown last,
+  // after the Hungarian group, rather than sorted in among the popularity-ordered main genres.
+  // Looked up by value (not a hardcoded "B") so it still matches whatever casing the catalog
+  // actually uses.
+  const otherGenre = genres.find(isOtherGenre);
+  const mainGenres = genres.filter((g) => !isHungarianGenre(g) && !isOtherGenre(g));
   const hunGenres = genres.filter(isHungarianGenre);
 
   const selectedHunCount = hunGenres.filter((g) => selected.includes(g)).length;
   const allHunSelected = hunGenres.length > 0 && selectedHunCount === hunGenres.length;
   const someHunSelected = selectedHunCount > 0 && !allHunSelected;
 
-  const totalGenres = mainGenres.length + hunGenres.length;
+  const totalGenres = genres.length;
 
   function toggle(genre: string) {
     if (selected.includes(genre)) {
@@ -96,6 +101,17 @@ export default function GenreSelector({ genres, selected, onChange }: GenreSelec
                   <ChevronDown className={cn("size-3.5 transition-transform duration-200", isHunOpen && "rotate-180")} />
                 </button>
               </div>
+            )}
+
+            {otherGenre && (
+              <button
+                type="button"
+                onClick={() => toggle(otherGenre)}
+                aria-pressed={selected.includes(otherGenre)}
+                className={chipClass(selected.includes(otherGenre))}
+              >
+                {genreLabel(otherGenre)}
+              </button>
             )}
           </div>
 
