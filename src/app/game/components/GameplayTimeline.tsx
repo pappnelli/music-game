@@ -1,6 +1,7 @@
 import { Song, Team, TokenPlacement } from "@/lib/store/gameSlice";
 import { Active, useDroppable } from "@dnd-kit/core";
 import { useSelector } from "react-redux";
+import { SelectedCard, SelectedToken } from "../GameClient";
 import TimelineItem from "./gameplaytimeline/TimelineItem";
 import TimelineSlot from "./gameplaytimeline/TimelineSlot";
 
@@ -17,9 +18,26 @@ interface GameState {
 interface GameplayTimelineProps {
   teamId: string | null;
   active: Active | null;
+  selectedToken: SelectedToken | null;
+  selectedCard: SelectedCard | null;
+  hoveredSlotIndex: number | null;
+  onTokenClick: (teamId: string, fromPosition: number) => void;
+  onCardClick: (fromPosition: number) => void;
+  onSlotClick: (index: number) => void;
+  onSlotHover: (index: number | null) => void;
 }
 
-export default function GameplayTimeline({ teamId, active }: GameplayTimelineProps) {
+export default function GameplayTimeline({
+  teamId,
+  active,
+  selectedToken,
+  selectedCard,
+  hoveredSlotIndex,
+  onTokenClick,
+  onCardClick,
+  onSlotClick,
+  onSlotHover,
+}: GameplayTimelineProps) {
   const teams = useSelector((state: GameState) => state.game.teams ?? []);
 
   const targetTeam = teams.find((t) => t.id === teamId);
@@ -47,11 +65,37 @@ export default function GameplayTimeline({ teamId, active }: GameplayTimelinePro
         }}
       />
 
-      <TimelineSlot index={0} isOver={isFirstOver} active={active} ref={setFirstSlotRef} />
+      <TimelineSlot
+        index={0}
+        isOver={isFirstOver}
+        active={active}
+        ref={setFirstSlotRef}
+        selectedToken={selectedToken}
+        selectedCard={selectedCard}
+        isHovered={hoveredSlotIndex === 0}
+        onTokenClick={onTokenClick}
+        onCardClick={onCardClick}
+        onSlotClick={onSlotClick}
+        onSlotHover={onSlotHover}
+      />
 
       {sortedCards.map((song: Song, i: number) => {
         const slotIndex = i + 1;
-        return <TimelineItem key={song.id} song={song} index={slotIndex} active={active} />;
+        return (
+          <TimelineItem
+            key={song.id}
+            song={song}
+            index={slotIndex}
+            active={active}
+            selectedToken={selectedToken}
+            selectedCard={selectedCard}
+            isHovered={hoveredSlotIndex === slotIndex}
+            onTokenClick={onTokenClick}
+            onCardClick={onCardClick}
+            onSlotClick={onSlotClick}
+            onSlotHover={onSlotHover}
+          />
+        );
       })}
     </div>
   );

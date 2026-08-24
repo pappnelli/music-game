@@ -2,7 +2,6 @@
 
 import FinalRoundRuleSelector from "@/app/setup/components/FinalRoundRuleSelector";
 import GenreSelector from "@/app/setup/components/GenreSelector";
-import HunGenreSelector from "@/app/setup/components/HunGenreSelector";
 import MusicModeSelector from "@/app/setup/components/MusicModeSelector";
 import SongsPerYearSelector from "@/app/setup/components/SongsPerYearSelector";
 import WinnerCardsSelector from "@/app/setup/components/WinnerCardsSelector";
@@ -31,7 +30,6 @@ export default function GameSettingsDialog({ open, onClose }: GameSettingsDialog
 
   const [localSettings, setLocalSettings] = useState({
     selectedGenres: gameState.selectedGenres,
-    hunGenreMode: gameState.hunGenreMode,
     yearStart: gameState.yearStart,
     yearEnd: gameState.yearEnd,
     songsPerYear: gameState.songsPerYear,
@@ -47,7 +45,6 @@ export default function GameSettingsDialog({ open, onClose }: GameSettingsDialog
         selectedGenres: localSettings.selectedGenres,
         yearStart: localSettings.yearStart,
         yearEnd: localSettings.yearEnd,
-        hunGenreMode: localSettings.hunGenreMode,
       }),
     );
     return capSongsPerYear(matched, localSettings.songsPerYear).length;
@@ -58,7 +55,7 @@ export default function GameSettingsDialog({ open, onClose }: GameSettingsDialog
 
   const missingRequirements = [
     hasDuplicateTeamNames && "Team names must be unique",
-    localSettings.hunGenreMode !== "only" && localSettings.selectedGenres.length === 0 && "Select at least one genre",
+    localSettings.selectedGenres.length === 0 && "Select at least one genre",
     (!localSettings.yearStart || !localSettings.yearEnd) && "Set a valid year range",
     !!localSettings.yearStart &&
       !!localSettings.yearEnd &&
@@ -106,12 +103,6 @@ export default function GameSettingsDialog({ open, onClose }: GameSettingsDialog
               genres={gameState.genres}
               selected={localSettings.selectedGenres}
               onChange={(list) => setLocalSettings((s) => ({ ...s, selectedGenres: list }))}
-              disabled={localSettings.hunGenreMode === "only"}
-            />
-
-            <HunGenreSelector
-              value={localSettings.hunGenreMode}
-              onChange={(mode) => setLocalSettings((s) => ({ ...s, hunGenreMode: mode }))}
             />
 
             <YearRangeSelector

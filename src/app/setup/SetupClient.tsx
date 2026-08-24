@@ -15,7 +15,6 @@ import {
   resetSetup,
   setFinalRoundRule,
   setGenre,
-  setHunGenreMode,
   setMusicMode,
   setSongsPerYear,
   setStartingTokens,
@@ -33,7 +32,6 @@ import { useEffect, useRef, useState } from "react";
 import BackButton from "./components/BackButton";
 import FinalRoundRuleSelector from "./components/FinalRoundRuleSelector";
 import GenreSelector from "./components/GenreSelector";
-import HunGenreSelector from "./components/HunGenreSelector";
 import MusicModeSelector from "./components/MusicModeSelector";
 import NewTeamInput from "./components/NewTeamInput";
 import SongsPerYearSelector from "./components/SongsPerYearSelector";
@@ -51,7 +49,7 @@ export default function SetupClient() {
   const { status } = useSession();
   const isSpotifyLoggedIn = status === "authenticated";
 
-  const { genre, genres, hunGenreMode, yearStart, yearEnd, songsPerYear, startingTokens, winCondition, teams, musicMode, finalRoundRule } =
+  const { genre, genres, yearStart, yearEnd, songsPerYear, startingTokens, winCondition, teams, musicMode, finalRoundRule } =
     useAppSelector((s) => s.setup);
 
   const gameStatus = useAppSelector((s) => s.game.status);
@@ -63,7 +61,7 @@ export default function SetupClient() {
   const missingRequirements = [
     teams.length < 2 && "Add at least 2 teams",
     hasDuplicateTeamNames && "Team names must be unique",
-    hunGenreMode !== "only" && genre.length === 0 && "Select at least one genre",
+    genre.length === 0 && "Select at least one genre",
     (!yearStart || !yearEnd) && "Set a valid year range",
     !!yearStart && !!yearEnd && yearStart > yearEnd && "Start year must be before end year",
     filteredSongs.length < teams.length * 2 && "Not enough songs match your filters",
@@ -130,7 +128,6 @@ export default function SetupClient() {
       startGame({
         selectedGenres: genre,
         genres,
-        hunGenreMode,
         yearStart,
         yearEnd,
         songsPerYear,
@@ -202,14 +199,7 @@ export default function SetupClient() {
               Music
             </h2>
 
-            <GenreSelector
-              genres={genres}
-              selected={genre}
-              onChange={(list) => dispatch(setGenre(list))}
-              disabled={hunGenreMode === "only"}
-            />
-
-            <HunGenreSelector value={hunGenreMode} onChange={(mode) => dispatch(setHunGenreMode(mode))} />
+            <GenreSelector genres={genres} selected={genre} onChange={(list) => dispatch(setGenre(list))} />
 
             <YearRangeSelector
               yearStart={yearStart}
